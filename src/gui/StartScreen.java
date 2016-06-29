@@ -12,9 +12,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.PrivateKeyResolver;
 
 public class StartScreen extends JPanel {
 	/**
@@ -33,13 +33,13 @@ public class StartScreen extends JPanel {
 	StartScreen(JFrame gameFrame) {
 		this.startFrame=gameFrame;
 		JPanel startPanel= new JPanel();
-		JMenuBar menuBar = new JMenuBar();
 		//Build the first menu.
 		JMenu addMenu = new JMenu(ADD_MENU_TITLE);
 		addMenu.setMnemonic(KeyEvent.VK_A);
 		addMenu.getAccessibleContext().setAccessibleDescription(
 		        "Adds applications to test");
-		JMenuItem addApp = new JMenuItem(ADD_APP_ITEM);
+		JMenuItem addApp = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
+		addApp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		addApp.addActionListener(new ActionListener() {
 			
 			@Override
@@ -88,6 +88,7 @@ public class StartScreen extends JPanel {
 			}
 		});
 		addMenu.add(addApp);
+		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(addMenu);
 		startFrame.setJMenuBar(menuBar);
 		startPanel.validate();
