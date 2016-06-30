@@ -10,7 +10,8 @@ import javax.swing.SwingUtilities;
  */
 public class Main {
 	private static final String TITLE = "Auto-Test";
-	
+	public static final String PATH =  System.getProperty("user.dir") +
+			"/resources/" ;
 	/**
 	 * main runner
 	 * @param args to be run with (nothing)
@@ -33,3 +34,5 @@ public class Main {
 	}
 
 }
+
+
