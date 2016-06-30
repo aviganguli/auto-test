@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
+import main.Log;
+
 
 public class StartScreen extends JPanel {
 	/**
@@ -24,15 +26,17 @@ public class StartScreen extends JPanel {
 	private JFrame startFrame;
 	private final String ADD_MENU_TITLE = "Add";
 	private final String ADD_APP_ITEM = "New Application";
+	private final String RECENT_APP_ITEM = "Recent Applications";
+	private final Log recentLog;
 	
-
 	/**
 	 * Constructor for all components
 	 * @param gameFrame frame game runs in
 	 */
 	StartScreen(JFrame gameFrame) {
-		this.startFrame=gameFrame;
-		JPanel startPanel= new JPanel();
+		this.recentLog = Log.RECENT;
+		this.startFrame = gameFrame;
+		JPanel startPanel = new JPanel();
 		//Build the first menu.
 		JMenu addMenu = new JMenu(ADD_MENU_TITLE);
 		addMenu.setMnemonic(KeyEvent.VK_A);
@@ -81,13 +85,23 @@ public class StartScreen extends JPanel {
 			    int returnVal = fileChooser.showOpenDialog(addApp);
 			    if (returnVal == JFileChooser.APPROVE_OPTION) {
 			            File file = fileChooser.getSelectedFile();
-			            System.out.println(file.getName());
+			            recentLog.addToLog(file.getAbsolutePath());
 			    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 			    	JOptionPane.showMessageDialog(startFrame, "Please select JAR file.");
 			   }
 			}
 		});
+		JMenuItem recentApps = new JMenuItem(RECENT_APP_ITEM,KeyEvent.VK_R);
+		recentApps.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
+		recentApps.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			}
+			
+		});
 		addMenu.add(addApp);
+		addMenu.add(recentApps);
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(addMenu);
 		startFrame.setJMenuBar(menuBar);
