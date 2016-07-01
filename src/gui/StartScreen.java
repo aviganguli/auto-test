@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -16,8 +18,13 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import main.Log;
+import main.StreamRedirector;
 
-
+/**
+ * 
+ * @author samuellee & Strawhat Jedi
+ *
+ */
 public class StartScreen extends JPanel {
 	/**
 	 * Boilerplate
@@ -86,20 +93,27 @@ public class StartScreen extends JPanel {
 			    if (returnVal == JFileChooser.APPROVE_OPTION) {
 			            File file = fileChooser.getSelectedFile();
 			            recentLog.addToLog(file.getAbsolutePath());
+			            startProgram(file.getPath());
+			            
 			    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 			    	JOptionPane.showMessageDialog(startFrame, "Please select JAR file.");
 			   }
 			}
 		});
-		JMenuItem recentApps = new JMenuItem(RECENT_APP_ITEM,KeyEvent.VK_R);
-		recentApps.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
-		recentApps.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			}
-			
-		});
+		JMenu recentApps = new JMenu(RECENT_APP_ITEM);
+		recentApps.setMnemonic(KeyEvent.VK_R);
+		List <String> recentPaths = recentLog.readFromLog();
+		for (String path : recentPaths) {
+			JMenuItem recent = new JMenuItem(path);
+			recent.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					startProgram(recent.getText());
+				}
+			});
+			recentApps.add(recent);
+		}
 		addMenu.add(addApp);
 		addMenu.add(recentApps);
 		JMenuBar menuBar = new JMenuBar();
@@ -108,5 +122,26 @@ public class StartScreen extends JPanel {
 		startPanel.validate();
 		startPanel.setVisible(true);
 	}
-		
+	
+	/**
+	 * function that takes in the name of a jar file and runs it while 
+	 * redirecting its standard out and error
+	 * @param executableName the name of the file to be run
+	 */
+	private void startProgram(String execeutableName) {
+		// Run a java app in a separate system process
+        Process proc;
+		try {
+			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new IllegalStateException("Application has the above error");
+		}
+        // Then retrieve the process output
+        StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
+        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
+        in.start();
+        err.start();
+	}
 }

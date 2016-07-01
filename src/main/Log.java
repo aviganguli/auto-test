@@ -1,31 +1,24 @@
 package main;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.stream.Stream;
 
 
 import gui.Main;
 
 
 /**
+ * 
+ * @author samuellee & StrawhatJedi
  * Create a new file log that contains 10 most recently used
  * file paths.  - Singleton Class
  * 
@@ -82,6 +75,22 @@ public enum Log {
 					+ "cause errors.") ;
 		}
 			
+	}
+	
+	public List<String> readFromLog() {
+		
+		List<String> result = new ArrayList<String>();
+		
+		try (Scanner scanner = new Scanner(rLog)) {
+			while (scanner.hasNextLine()) {
+				result.add(scanner.nextLine());
+			}
+			
+		} catch (FileNotFoundException e) {
+			throw new IllegalStateException("Log file should already exist.");
+		}
+	
+		return result;
 	}
 }
 	 
