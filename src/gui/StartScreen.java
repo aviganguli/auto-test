@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.script.ScriptException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -19,6 +20,7 @@ import javax.swing.filechooser.FileFilter;
 
 import main.Log;
 import main.StreamRedirector;
+import main.WindowManager;
 
 /**
  * 
@@ -35,6 +37,9 @@ public class StartScreen extends JPanel {
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
 	private final Log recentLog;
+	private boolean programLaunched = false ; 
+	// ENSURE only 1 program launched for testing, have not implemented yet
+	public WindowManager wm = new WindowManager() ;
 	
 	/**
 	 * Constructor for all components
@@ -121,6 +126,12 @@ public class StartScreen extends JPanel {
 		startFrame.setJMenuBar(menuBar);
 		startPanel.validate();
 		startPanel.setVisible(true);
+		try {
+			wm.getOpenWindowsTitles();
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -133,6 +144,7 @@ public class StartScreen extends JPanel {
         Process proc;
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
+			programLaunched = true ;
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
