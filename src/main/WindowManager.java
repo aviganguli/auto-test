@@ -18,12 +18,21 @@ public class WindowManager {
 	private final String OS_TYPE ;
 	
 	public WindowManager() {
-		OS_TYPE = System.getProperty("os.name");
+		OS_TYPE = System.getProperty("os.name").toLowerCase();
 		return ;
 		
 	}
 	
 	public void getOpenWindowsTitles() throws ScriptException{
+		if(OS_TYPE.contains("mac") ) getAppleOpenWindowsTitles();
+		
+		return ;
+		
+		
+	}
+	
+	
+	private void getAppleOpenWindowsTitles() throws ScriptException {
 		List<String> titles = new ArrayList<String>() ;
 		String script = "tell application \"System Events\" to get " + 
 		        "the title of every window of every process";
@@ -42,14 +51,13 @@ public class WindowManager {
 			if(o != null) {
 				String elem = o.toString() ;
 				titles.add(elem) ;
-				System.out.print(elem) ;
+				System.out.print(elem + "\n") ;
 				
 			}	
 		}
 		return ;
+		
 	}
-	
-	
 	private List<Object> flatten(Collection<Object> obj){
 		ArrayList<Object> res = new ArrayList<Object>() ;
 		for(Object o : obj){
