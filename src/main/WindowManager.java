@@ -33,7 +33,7 @@ public class WindowManager {
 	
 	public void getOpenWindowsTitles() throws ScriptException{
 		if(OS_TYPE.contains("mac") ) getAppleOpenWindowsTitles();
-		
+		else System.out.println("OS not supported");
 		return ;
 		
 		
@@ -66,26 +66,39 @@ public class WindowManager {
 	}
 	
 	public void maximizeWindows() throws ScriptException {
-		String script = "tell application \"System Events\" to tell (process 1 where frontmost is true)\n" +
-						"try\n" + "click (button 1 of window 1 whose subrole is \"AXZoomButton\")\n" +
-						"end try\n" + "end tell" ;
-		System.out.print(script);
-		getOpenWindowsTitles();
-		engine.eval(script) ;
-		//System.out.println("EXECUTED MAXIMIZE");
+		if(OS_TYPE.contains("mac")) appleMaximizeWindows();
+		else System.out.println("OS not supported");
 		return ;
+		
+		
 	}
 	
-	private List<Object> flatten(Collection<Object> objs){
-		ArrayList<Object> res = new ArrayList<Object>() ;
-		for(Object o : objs){
-			if(o instanceof Collection) {
-				res.addAll( flatten((Collection)o) ) ;
+	
+	private void appleMaximizeWindows() throws ScriptException {
+		// posibly perform in another thread and do thread_join() 
+				String script = "tell application \"System Events\" to tell (process 1 where frontmost is true)\n" +
+								"try\n" + "click (button 1 of window 1 whose subrole is \"AXZoomButton\")\n" +
+								"end try\n" + "end tell" ;
+				//System.out.print(script);
+				//getOpenWindowsTitles(); for debugging
+				engine.eval(script) ;
+				//System.out.println("EXECUTED MAXIMIZE");
+				return ;
 			}
-			else{
-				res.add(o) ;
-			}
-		}
-		return res ;
+			
+			private List<Object> flatten(Collection<Object> objs){
+				ArrayList<Object> res = new ArrayList<Object>() ;
+				for(Object o : objs){
+					if(o instanceof Collection) {
+						res.addAll( flatten((Collection)o) ) ;
+					}
+					else{
+						res.add(o) ;
+					}
+				}
+				return res ;
 	}
 }
+
+
+
