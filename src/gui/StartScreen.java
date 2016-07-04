@@ -127,7 +127,7 @@ public class StartScreen extends JPanel {
 		startPanel.validate();
 		startPanel.setVisible(true);
 		try {
-			wm.getOpenWindowsTitles();
+			wm.getOpenWindowsTitles(); //TESTING GET WINDOWS TITLES
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,16 +144,22 @@ public class StartScreen extends JPanel {
         Process proc;
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
+			wm.maximizeWindows() ; //MAXIMIZE TEST 
 			programLaunched = true ;
+			 // Then retrieve the process output
+	        StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
+	        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
+	        in.start();
+	        err.start();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			throw new IllegalStateException("Application has the above error");
+		} catch (ScriptException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			//System.out.println("Maximize failed");
 		}
-        // Then retrieve the process output
-        StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
-        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
-        in.start();
-        err.start();
+		
 	}
 }
