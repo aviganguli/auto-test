@@ -15,6 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 
 import main.Log;
@@ -102,18 +104,37 @@ public class StartScreen extends JPanel {
 		});
 		JMenu recentApps = new JMenu(RECENT_APP_ITEM);
 		recentApps.setMnemonic(KeyEvent.VK_R);
-		List <String> recentPaths = recentLog.readFromLog();
-		for (String path : recentPaths) {
-			JMenuItem recent = new JMenuItem(path);
-			recent.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					startProgram(recent.getText());
+		recentApps.addMenuListener(new MenuListener() {
+			
+			@Override
+			public void menuSelected(MenuEvent e) {
+				List <String> recentPaths = recentLog.readFromLog();
+				for (String path : recentPaths) {
+					JMenuItem recent = new JMenuItem(path);
+					recent.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							startProgram(recent.getText());
+						}
+					});
+					recentApps.add(recent);
 				}
-			});
-			recentApps.add(recent);
-		}
+				
+			}
+			
+			@Override
+			public void menuDeselected(MenuEvent e) {
+				recentApps.removeAll();
+				
+			}
+			
+			@Override
+			public void menuCanceled(MenuEvent e) {
+				// do nothing
+				
+			}
+		});
 		addMenu.add(addApp);
 		addMenu.add(recentApps);
 		JMenuBar menuBar = new JMenuBar();
