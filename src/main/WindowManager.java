@@ -1,30 +1,24 @@
 package main;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Semaphore;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.sun.org.apache.xml.internal.serializer.ElemDesc;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
-import sun.font.Script;
 
 public class WindowManager {
 
 	private final String OS_TYPE ;
-	private final ScriptEngineManager man ;
+	private final ScriptEngineManager manager ;
 	private final ScriptEngine engine ;
 	
 	public WindowManager() {
 		OS_TYPE = System.getProperty("os.name").toLowerCase();
-		man = new ScriptEngineManager() ;
-		if(OS_TYPE.contains("mac")) engine = man.getEngineByName("AppleScriptEngine") ; 
+		manager = new ScriptEngineManager() ;
+		if(OS_TYPE.contains("mac")) engine = manager.getEngineByName("AppleScriptEngine") ; 
 		else engine = null ;
 		
 		return ;
@@ -32,7 +26,9 @@ public class WindowManager {
 	}
 	
 	public void getOpenWindowsTitles() throws ScriptException{
-		if(OS_TYPE.contains("mac") ) getAppleOpenWindowsTitles();
+		if(OS_TYPE.contains("mac") ) {
+			getAppleOpenWindowsTitles();
+		}
 		else System.out.println("OS not supported");
 		return ;
 		
@@ -76,13 +72,28 @@ public class WindowManager {
 	
 	private void appleMaximizeWindows() throws ScriptException {
 		// posibly perform in another thread and do thread_join() 
-				String script = "tell application \"System Events\" to tell (process 1 where frontmost is true)\n" +
-								"try\n" + "click (button 1 of window 1 whose subrole is \"AXZoomButton\")\n" +
-								"end try\n" + "end tell" ;
+				String script = "tell application \"System Events\" to tell (first process where frontmost is true)\n" +
+								"click (button 1 where subrole is \"AXZoomButton\" of window 1 )\n" +
+								 "end tell\n" + "tell application \"System Events\" to get name of (process 1 where frontmost is true)" ;
+				String script2 = "tell application \"System Events\" to tell (process 1 whose name is \"java\")\n" +
+						"click (button 2 of window 1)\n" +
+						"end tell" ;
+				String script3 = "tell application \"System Events\"" +
+						"set front window's bounds to {0,0,1000,1000}\n" +
+						"end tell" ;
 				//System.out.print(script);
 				//getOpenWindowsTitles(); for debugging
-				engine.eval(script) ;
-				//System.out.println("EXECUTED MAXIMIZE");
+				//System.out.println(engine.eval(script) );
+				String src_file = (System.getProperty("user.dir")) + "/maximize.scpt";
+				try {
+					System.out.println(src_file);
+					Runtime.getRuntime().exec(new String[] { "osascript", src_file }) ;
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("EXECUTED MAXIMIZE");
 				return ;
 			}
 			
