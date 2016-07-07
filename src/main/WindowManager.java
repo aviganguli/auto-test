@@ -28,8 +28,7 @@ public class WindowManager {
 			@Override
 			void execute() {
 				try {
-					System.out.println(SCRIPT.get(0));
-					Process process = Runtime.getRuntime().exec(SCRIPT.get(0));
+					Runtime.getRuntime().exec(SCRIPT.get(0));
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new IllegalStateException("Scripts failed!");
