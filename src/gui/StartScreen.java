@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -21,6 +22,7 @@ import javax.swing.filechooser.FileFilter;
 
 import main.Log;
 import main.StreamRedirector;
+import main.WindowManager;
 
 /**
  * 
@@ -154,11 +156,17 @@ public class StartScreen extends JPanel {
         Process proc;
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new IllegalStateException("Application has the above error");
+			try {
+				proc.waitFor(3, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new IllegalStateException("Script setup error!");
+			}
+		}	catch (IOException e1) {
+				e1.printStackTrace();
+				throw new IllegalStateException("Application has the above error");
 		}
+		WindowManager.execute();
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
