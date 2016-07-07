@@ -11,9 +11,7 @@ public class WindowManager {
 	public static void execute() {
 		String osType = System.getProperty("os.name").toLowerCase();
 		if (osType.contains("mac")) {
-			System.out.println(MAC_SCRIPT_PATH);
 			Scripts.MAC.execute();
-			System.out.println("HELO");
 		}
 	}
 	
@@ -31,7 +29,7 @@ public class WindowManager {
 			void execute() {
 				try {
 					System.out.println(SCRIPT.get(0));
-					Runtime.getRuntime().exec(SCRIPT.get(0));
+					Process process = Runtime.getRuntime().exec(SCRIPT.get(0));
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new IllegalStateException("Scripts failed!");
