@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.script.ScriptException;
 import javax.swing.JFileChooser;
@@ -144,6 +145,12 @@ public class StartScreen extends JPanel {
         Process proc;
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
+			try {
+				proc.waitFor(2, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			wm.maximizeWindows() ; //MAXIMIZE TEST 
 			programLaunched = true ;
 			 // Then retrieve the process output
