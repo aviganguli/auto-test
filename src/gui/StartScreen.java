@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.script.ScriptException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -23,7 +24,6 @@ import javax.swing.filechooser.FileFilter;
 import main.Log;
 import main.StreamRedirector;
 import main.WindowManager;
-
 
 /**
  * 
