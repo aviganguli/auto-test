@@ -1,0 +1,125 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red127\green0\blue85;\red42\green0\blue255;\red63\green127\blue95;
+\red127\green159\blue191;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720
+
+\f0\fs22 \cf0 \ul \ulc0 <<<<<<< HEAD\ulnone \
+\pard\pardeftab720
+\cf2 import\cf0  java.util.ArrayList;\
+\cf2 import\cf0  java.util.Collection;\
+\cf2 import\cf0  java.util.List;\
+\cf2 import\cf0  javax.script.ScriptEngine;\
+\cf2 import\cf0  javax.script.ScriptEngineManager;\
+\cf2 import\cf0  javax.script.ScriptException;\
+\
+\
+\pard\pardeftab720
+\cf2 \ul \ulc2 public\cf0 \ulc0  \cf2 \ulc2 class\cf0 \ulc0  WindowManager \{\ulnone \
+\
+\pard\pardeftab720
+\cf0 \ul \ulc0 	\cf2 \ulc2 private\cf0 \ulc0  \cf2 \ulc2 final\cf0 \ulc0  String OS_TYPE ;\ulnone \
+\ul 	\cf2 \ulc2 private\cf0 \ulc0  \cf2 \ulc2 final\cf0 \ulc0  ScriptEngineManager manager ;\ulnone \
+\ul 	\cf2 \ulc2 private\cf0 \ulc0  \cf2 \ulc2 final\cf0 \ulc0  ScriptEngine engine ;\ulnone \
+\ul 	\ulnone \
+\ul 	\cf2 \ulc2 public\cf0 \ulc0  WindowManager() \{\ulnone \
+\ul 		OS_TYPE = System.getProperty(\cf3 \ulc3 "os.name"\cf0 \ulc0 ).toLowerCase();\ulnone \
+\ul 		manager = \cf2 \ulc2 new\cf0 \ulc0  ScriptEngineManager() ;\ulnone \
+\ul 		\cf2 \ulc2 if\cf0 \ulc0 (OS_TYPE.contains(\cf3 \ulc3 "mac"\cf0 \ulc0 )) engine = manager.getEngineByName(\cf3 \ulc3 "AppleScriptEngine"\cf0 \ulc0 ) ; \ulnone \
+\ul 		\cf2 \ulc2 else\cf0 \ulc0  engine = \cf2 \ulc2 null\cf0 \ulc0  ;\ulnone \
+\ul 		\ulnone \
+\ul 		\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\ulnone \
+\ul 	\}\ulnone \
+\ul 	\ulnone \
+\ul 	\cf2 \ulc2 public\cf0 \ulc0  \cf2 \ulc2 void\cf0 \ulc0  getOpenWindowsTitles() \cf2 \ulc2 throws\cf0 \ulc0  ScriptException\{\ulnone \
+\ul 		\cf2 \ulc2 if\cf0 \ulc0 (OS_TYPE.contains(\cf3 \ulc3 "mac"\cf0 \ulc0 ) ) \{\ulnone \
+\ul 			getAppleOpenWindowsTitles();\ulnone \
+\ul 		\}\ulnone \
+\ul 		\cf2 \ulc2 else\cf0 \ulc0  System.out.println(\cf3 \ulc3 "OS not supported"\cf0 \ulc0 );\ulnone \
+\ul 		\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\ulnone \
+\ul 		\ulnone \
+\ul 	\}\ulnone \
+\ul 	\ulnone \
+\ul 	\ulnone \
+\ul 	\cf2 \ulc2 private\cf0 \ulc0  \cf2 \ulc2 void\cf0 \ulc0  getAppleOpenWindowsTitles() \cf2 \ulc2 throws\cf0 \ulc0  ScriptException \{\ulnone \
+\ul 		List<String> titles = \cf2 \ulc2 new\cf0 \ulc0  ArrayList<String>() ;\ulnone \
+\ul 		String script = \cf3 \ulc3 "tell application \\"System Events\\" to get "\cf0 \ulc0  + \ulnone \
+\ul 		        \cf3 \ulc3 "the title of every window of every process"\cf0 \ulc0 ;\ulnone \
+\ul 		\cf2 \ulc2 if\cf0 \ulc0 (engine == \cf2 \ulc2 null\cf0 \ulc0 ) \{\ulnone \
+\ul 			System.out.println(\cf3 \ulc3 "NO ENGINE"\cf0 \ulc0 );\ulnone \
+\ul 			\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\}\ulnone \
+\ul 		ArrayList<Object> res = (ArrayList<Object>)engine.eval(script) ;\ulnone \
+\ul 		\cf2 \ulc2 if\cf0 \ulc0 (res == \cf2 \ulc2 null\cf0 \ulc0 ) \{\ulnone \
+\ul 			System.out.println(\cf3 \ulc3 "No Windows opened"\cf0 \ulc0 );\ulnone \
+\ul 			\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\}\ulnone \
+\ul 		\cf2 \ulc2 for\cf0 \ulc0 (Object o : flatten(res)) \{\ulnone \
+\ul 			\cf2 \ulc2 if\cf0 \ulc0 (o != \cf2 \ulc2 null\cf0 \ulc0 ) \{\ulnone \
+\ul 				String elem = o.toString() ;\ulnone \
+\ul 				titles.add(elem) ;\ulnone \
+\ul 				System.out.print(elem + \cf3 \ulc3 "\\n"\cf0 \ulc0 ) ;\ulnone \
+\ul 				\ulnone \
+\ul 			\}	\ulnone \
+\ul 		\}\ulnone \
+\ul 		\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\ulnone \
+\ul 	\}\ulnone \
+\ul 	\ulnone \
+\ul 	\cf2 \ulc2 public\cf0 \ulc0  \cf2 \ulc2 void\cf0 \ulc0  maximizeWindows() \cf2 \ulc2 throws\cf0 \ulc0  ScriptException \{\ulnone \
+\ul 		\cf2 \ulc2 if\cf0 \ulc0 (OS_TYPE.contains(\cf3 \ulc3 "mac"\cf0 \ulc0 )) appleMaximizeWindows();\ulnone \
+\ul 		\cf2 \ulc2 else\cf0 \ulc0  System.out.println(\cf3 \ulc3 "OS not supported"\cf0 \ulc0 );\ulnone \
+\ul 		\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 		\ulnone \
+\ul 		\ulnone \
+\ul 	\}\ulnone \
+\ul 	\ulnone \
+\ul 	\ulnone \
+\ul 	\cf2 \ulc2 private\cf0 \ulc0  \cf2 \ulc2 void\cf0 \ulc0  appleMaximizeWindows() \cf2 \ulc2 throws\cf0 \ulc0  ScriptException \{\ulnone \
+\ul 		\cf4 \ulc4 // posibly perform in another thread and do thread_join() \cf0 \ulnone \
+\ul 				String script = \cf3 \ulc3 "tell application \\"System Events\\" to tell (first process where frontmost is true)\\n"\cf0 \ulc0  +\ulnone \
+\ul 								\cf3 \ulc3 "click (button 1 where subrole is \\"AXZoomButton\\" of window 1 )\\n"\cf0 \ulc0  +\ulnone \
+\ul 								 \cf3 \ulc3 "end tell\\n"\cf0 \ulc0  + \cf3 \ulc3 "tell application \\"System Events\\" to get name of (process 1 where frontmost is true)"\cf0 \ulc0  ;\ulnone \
+\ul 				String script2 = \cf3 \ulc3 "tell application \\"System Events\\" to tell (process 1 whose name is \\"java\\")\\n"\cf0 \ulc0  +\ulnone \
+\ul 						\cf3 \ulc3 "click (button 2 of window 1)\\n"\cf0 \ulc0  +\ulnone \
+\ul 						\cf3 \ulc3 "end tell"\cf0 \ulc0  ;\ulnone \
+\ul 				String script3 = \cf3 \ulc3 "tell application \\"System Events\\""\cf0 \ulc0  +\ulnone \
+\ul 						\cf3 \ulc3 "set front window's bounds to \{0,0,1000,1000\}\\n"\cf0 \ulc0  +\ulnone \
+\ul 						\cf3 \ulc3 "end tell"\cf0 \ulc0  ;\ulnone \
+\ul 				\cf4 \ulc4 //System.out.print(script);\cf0 \ulnone \
+\ul 				\cf4 \ulc4 //getOpenWindowsTitles(); for debugging\cf0 \ulnone \
+\ul 				\cf4 \ulc4 //System.out.println(engine.eval(script) );\cf0 \ulnone \
+\ul 				String src_file = (System.getProperty(\cf3 \ulc3 "user.dir"\cf0 \ulc0 )) + \cf3 \ulc3 "/maximize.scpt"\cf0 \ulc0 ;\ulnone \
+\ul 				\cf2 \ulc2 try\cf0 \ulc0  \{\ulnone \
+\ul 					System.out.println(src_file);\ulnone \
+\ul 					Runtime.getRuntime().exec(\cf2 \ulc2 new\cf0 \ulc0  String[] \{ \cf3 \ulc3 "osascript"\cf0 \ulc0 , src_file \}) ;\ulnone \
+\ul 					\ulnone \
+\ul 				\} \cf2 \ulc2 catch\cf0 \ulc0  (IOException e) \{\ulnone \
+\ul 					\cf4 \ulc4 // \cf5 \ulc5 TODO\cf4 \ulc4  Auto-generated catch block\cf0 \ulnone \
+\ul 					e.printStackTrace();\ulnone \
+\ul 				\}\ulnone \
+\ul 				System.out.println(\cf3 \ulc3 "EXECUTED MAXIMIZE"\cf0 \ulc0 );\ulnone \
+\ul 				\cf2 \ulc2 return\cf0 \ulc0  ;\ulnone \
+\ul 			\}\ulnone \
+\ul 			\ulnone \
+\ul 			\cf2 \ulc2 private\cf0 \ulc0  List<Object> flatten(Collection<Object> objs)\{\ulnone \
+\ul 				ArrayList<Object> res = \cf2 \ulc2 new\cf0 \ulc0  ArrayList<Object>() ;\ulnone \
+\ul 				\cf2 \ulc2 for\cf0 \ulc0 (Object o : objs)\{\ulnone \
+\ul 					\cf2 \ulc2 if\cf0 \ulc0 (o \cf2 \ulc2 instanceof\cf0 \ulc0  Collection) \{\ulnone \
+\ul 						res.addAll( flatten((Collection)o) ) ;\ulnone \
+\ul 					\}\ulnone \
+\ul 					\cf2 \ulc2 else\cf0 \ulc0 \{\ulnone \
+\ul 						res.add(o) ;\ulnone \
+\ul 					\}\ulnone \
+\ul 				\}\ulnone \
+\ul 				\cf2 \ulc2 return\cf0 \ulc0  res ;\ulnone \
+\ul 	\}\ulnone \
+\ul \}\ulnone \
+\
+\
+\
+\ul =======}

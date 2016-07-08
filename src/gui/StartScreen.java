@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.script.ScriptException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -39,6 +40,9 @@ public class StartScreen extends JPanel {
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
 	private final Log recentLog;
+	private boolean programLaunched = false ; 
+	// ENSURE only 1 program launched for testing, have not implemented yet
+	public WindowManager wm = new WindowManager() ;
 	
 	/**
 	 * Constructor for all components
