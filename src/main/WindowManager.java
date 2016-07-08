@@ -24,7 +24,7 @@ public class WindowManager {
 	}
 	
 	private enum Scripts {
-		LINUX(Arrays.asList()) {
+		LINUX(Arrays.asList("")) {
 			@Override
 			void execute() {
 				// TODO Auto-generated method stub
@@ -44,7 +44,7 @@ public class WindowManager {
 			}
 		},
 		
-		WINDOWS(Arrays.asList()) {
+		WINDOWS(Arrays.asList("")) {
 
 			@Override
 			void execute() {
@@ -88,3 +88,4 @@ public class WindowManager {
     }
 
 }
+
