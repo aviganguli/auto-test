@@ -157,7 +157,7 @@ public class StartScreen extends JPanel {
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
 			try {
-				proc.waitFor(3, TimeUnit.SECONDS);
+				proc.waitFor(1, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				throw new IllegalStateException("Script setup error!");
