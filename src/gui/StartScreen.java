@@ -17,6 +17,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 
 import main.Log;
@@ -108,18 +110,37 @@ public class StartScreen extends JPanel {
 		});
 		JMenu recentApps = new JMenu(RECENT_APP_ITEM);
 		recentApps.setMnemonic(KeyEvent.VK_R);
-		List <String> recentPaths = recentLog.readFromLog();
-		for (String path : recentPaths) {
-			JMenuItem recent = new JMenuItem(path);
-			recent.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					startProgram(recent.getText());
+		recentApps.addMenuListener(new MenuListener() {
+			
+			@Override
+			public void menuSelected(MenuEvent e) {
+				List <String> recentPaths = recentLog.readFromLog();
+				for (String path : recentPaths) {
+					JMenuItem recent = new JMenuItem(path);
+					recent.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							startProgram(recent.getText());
+						}
+					});
+					recentApps.add(recent);
 				}
-			});
-			recentApps.add(recent);
-		}
+				
+			}
+			
+			@Override
+			public void menuDeselected(MenuEvent e) {
+				recentApps.removeAll();
+				
+			}
+			
+			@Override
+			public void menuCanceled(MenuEvent e) {
+				// do nothing
+				
+			}
+		});
 		addMenu.add(addApp);
 		addMenu.add(recentApps);
 		JMenuBar menuBar = new JMenuBar();
@@ -127,12 +148,6 @@ public class StartScreen extends JPanel {
 		startFrame.setJMenuBar(menuBar);
 		startPanel.validate();
 		startPanel.setVisible(true);
-		try {
-			wm.getOpenWindowsTitles(); //TESTING GET WINDOWS TITLES
-		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -146,27 +161,20 @@ public class StartScreen extends JPanel {
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
 			try {
-				proc.waitFor(2, TimeUnit.SECONDS);
+				proc.waitFor(3, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new IllegalStateException("Script setup error!");
 			}
-			wm.maximizeWindows() ; //MAXIMIZE TEST 
-			programLaunched = true ;
-			 // Then retrieve the process output
-	        StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
-	        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
-	        in.start();
-	        err.start();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new IllegalStateException("Application has the above error");
-		} catch (ScriptException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-			//System.out.println("Maximize failed");
+		}	catch (IOException e1) {
+				e1.printStackTrace();
+				throw new IllegalStateException("Application has the above error");
 		}
-		
+		WindowManager.execute();
+        // Then retrieve the process output
+        StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
+        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
+        in.start();
+        err.start();
 	}
 }

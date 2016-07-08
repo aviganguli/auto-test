@@ -1,0 +1,26 @@
+#!/usr/bin/env python2
+
+import sys
+
+import xpybutil.event as event
+
+import pt3.config as config
+
+# Perhaps we want to debug...
+if '--debug' in sys.argv:
+    config.debug = True
+
+import pt3.keybind
+import pt3.state as state
+import pt3.tile as tile
+import pt3.client as client
+
+tile.update_tilers()
+client.update_clients()
+
+# Get those juices flowing...
+state.PYTYLE_STATE = 'running'
+
+# Start the event loop
+event.main()
+

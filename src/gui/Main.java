@@ -1,10 +1,7 @@
 package gui;
 
-import javax.script.ScriptException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
-import main.WindowManager;
 
 /**
  * Main class running my start screen
