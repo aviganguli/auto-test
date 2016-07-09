@@ -13,7 +13,6 @@ import java.util.Scanner;
 import java.util.Set;
 
 
-import gui.Main;
 
 
 /**
@@ -26,7 +25,7 @@ import gui.Main;
 public enum Log {
 	RECENT;
 	private final String FILE_NAME = "recentLog.txt" ;
-	private final String FILE_PATH = Main.PATH + "config/";
+	private final String FILE_PATH = "Downloads/";
 	private File rLog;
 	private final int LIMIT = 10;
 	
@@ -35,8 +34,13 @@ public enum Log {
 	 */
 	Log() {
 		this.rLog = new File(FILE_PATH + FILE_NAME);
-		if(!rLog.exists() || rLog.isDirectory()) { 
-			throw new IllegalStateException("Log file should already exist.") ; 
+		if(!rLog.exists()) { 
+			try {
+				rLog.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new IllegalStateException("Shouldn't happen!");
+			} 
 		}
 	}
 	
