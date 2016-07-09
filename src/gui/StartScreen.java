@@ -57,7 +57,7 @@ public class StartScreen extends JPanel {
 		addMenu.setMnemonic(KeyEvent.VK_A);
 		addMenu.getAccessibleContext().setAccessibleDescription(
 		        "Adds applications to test");
-		JMenuItem addApp = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
+		final JMenuItem addApp = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
 		addApp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		addApp.addActionListener(new ActionListener() {
 			
@@ -108,7 +108,7 @@ public class StartScreen extends JPanel {
 			   }
 			}
 		});
-		JMenu recentApps = new JMenu(RECENT_APP_ITEM);
+		final JMenu recentApps = new JMenu(RECENT_APP_ITEM);
 		recentApps.setMnemonic(KeyEvent.VK_R);
 		recentApps.addMenuListener(new MenuListener() {
 			
@@ -116,7 +116,7 @@ public class StartScreen extends JPanel {
 			public void menuSelected(MenuEvent e) {
 				List <String> recentPaths = recentLog.readFromLog();
 				for (String path : recentPaths) {
-					JMenuItem recent = new JMenuItem(path);
+					final JMenuItem recent = new JMenuItem(path);
 					recent.addActionListener(new ActionListener() {
 						
 						@Override
