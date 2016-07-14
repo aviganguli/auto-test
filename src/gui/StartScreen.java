@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileFilter;
 import main.Log;
 import main.StreamRedirector;
 import main.WindowManager;
+import main.mouseManager;
 
 /**
  * 

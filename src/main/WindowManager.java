@@ -11,8 +11,9 @@ import java.util.List;
 
 public class WindowManager {
 	private static String MAC_SCRIPT_PATH = System.getProperty("user.dir") +  
-			File.separator + "maximize.scpt";
-	
+			File.separator + "maximize.scpt"; 
+			/*remember to have user allow access permissions.
+			currently uses folder method */
 	public static void execute() {
 		String osType = System.getProperty("os.name").toLowerCase();
 		if (osType.contains("mac")) {
