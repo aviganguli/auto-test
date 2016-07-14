@@ -38,7 +38,7 @@ public class StartScreen extends JPanel {
 	private final String ADD_MENU_TITLE = "Add";
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
-	private final Log recentLog;
+	public final Log recentLog;
 	
 	/**
 	 * Constructor for all components
@@ -98,7 +98,6 @@ public class StartScreen extends JPanel {
 			            File file = fileChooser.getSelectedFile();
 			            recentLog.addToLog(file.getAbsolutePath());
 			            startProgram(file.getPath());
-			            
 			    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 			    	JOptionPane.showMessageDialog(startFrame, "Please select JAR file.");
 			   }
@@ -117,7 +116,9 @@ public class StartScreen extends JPanel {
 						
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							
 							startProgram(recent.getText());
+							
 						}
 					});
 					recentApps.add(recent);
@@ -151,13 +152,17 @@ public class StartScreen extends JPanel {
 	 * redirecting its standard out and error
 	 * @param executableName the name of the file to be run
 	 */
-	private void startProgram(String execeutableName) {
+	private void startProgram(String executableName) {
 		// Run a java app in a separate system process
         Process proc;
+        String os_type = System.getProperty("os.name").toLowerCase() ;
+        if(os_type.contains("windows")) executableName = "\"" + executableName + "\"" ;
+        
 		try {
-			proc = Runtime.getRuntime().exec("java -jar " + execeutableName);
+			proc = Runtime.getRuntime().exec("java -jar " + executableName);
 			try {
-				proc.waitFor(1, TimeUnit.SECONDS);
+				proc.waitFor(3, TimeUnit.SECONDS); 
+				//should handle case where user switches window
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				throw new IllegalStateException("Script setup error!");
@@ -172,5 +177,9 @@ public class StartScreen extends JPanel {
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
         in.start();
         err.start();
+	}
+	
+	public void updateOnClose() {
+		recentLog.updateJar(); 	
 	}
 }
