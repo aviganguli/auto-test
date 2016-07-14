@@ -55,43 +55,7 @@ public enum Log {
 		System.out.println(rLog_jar);
 	}
 
-	/*public void addToLog(String path) {
-		try (Scanner scanner = new Scanner(rLog)) {
-			List<String> paths = new ArrayList<String>();
-			while (scanner.hasNextLine()) {
-				paths.add(scanner.nextLine());
-			}
-			Set<String> uniquePaths = Collections.newSetFromMap(new LinkedHashMap<String, Boolean>(){
-				*//**
-				 * boiler plate
-				 *//*
-				private static final long serialVersionUID = 1L;
-
-				protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
-			        return size() > LIMIT;
-			    }
-			});
-			uniquePaths.addAll(paths);
-			if (uniquePaths.contains(path)) {
-				uniquePaths.remove(path);
-			}
-			uniquePaths.add(path);
-			rLog.delete();
-			rLog.createNewFile();
-			PrintWriter fw = new PrintWriter(rLog);
-			System.out.println(uniquePaths);
-			for (String newPath : uniquePaths) {
-				fw.println(newPath);
-			}
-			fw.close();
-			return;
-		} catch (IOException e) {
-			throw new IllegalStateException("Log file i/o should not "
-					+ "cause errors.") ;
-		}
-			
-	}
-	*/
+	
 	public void addToLog(String path) { 
 		//reads from jar during first run else read from rLog
 		try (Scanner scanner = (read_jar) ? new Scanner(rLog) : new Scanner(rLog_jar)) {
