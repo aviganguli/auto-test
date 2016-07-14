@@ -1,17 +1,15 @@
 package main;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-
 
 public class WindowManager {
-	private static String MAC_SCRIPT_PATH = System.getProperty("user.dir") + "/maximize.scpt";
+	private static String MAC_SCRIPT_PATH = "/maximize.scpt";
 	
 	public static void execute() {
 		String osType = System.getProperty("os.name").toLowerCase();
@@ -21,13 +19,25 @@ public class WindowManager {
 		else if (osType.contains("windows")) {
 			Scripts.WINDOWS.execute();
 		}
+		else if(osType.contains("linux")) {
+			Scripts.LINUX.execute();
+		}
 	}
 	
 	private enum Scripts {
 		LINUX(Arrays.asList("")) {
 			@Override
 			void execute() {
-				// TODO Auto-generated method stub
+				try {
+					Robot rob = new Robot() ;
+					rob.keyPress(KeyEvent.VK_ALT);
+					rob.keyPress(KeyEvent.VK_F10);
+			        rob.keyRelease(KeyEvent.VK_ALT);
+			        rob.keyRelease(KeyEvent.VK_F10);
+				} catch (AWTException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 			}
 		}, 
@@ -49,28 +59,12 @@ public class WindowManager {
 			@Override
 			void execute() {
 				try {
-					Runtime.getRuntime().exec("python -m pip install pypiwin32");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					throw new IllegalStateException("Shouldn't happen!");
-				}
-				ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
-				try {
-					engine.eval("import win32gui, win32con");
-				} catch (ScriptException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					engine.eval("hwnd = win32gui.GetForegroundWindow()");
-				} catch (ScriptException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					engine.eval("win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)");
-				} catch (ScriptException e) {
+					Robot rob = new Robot() ;
+					rob.keyPress(KeyEvent.VK_WINDOWS);
+					rob.keyPress(KeyEvent.VK_UP);
+			        rob.keyRelease(KeyEvent.VK_WINDOWS);
+			        rob.keyRelease(KeyEvent.VK_UP);
+				} catch (AWTException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

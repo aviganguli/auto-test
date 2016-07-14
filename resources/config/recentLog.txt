@@ -1,8 +1,0 @@
-f
-g
-h
-i
-j
-l
-/Users/samuellee/auto-test/resources/test.jar
-/Users/Ganguli/auto-test/resources/test.jar
