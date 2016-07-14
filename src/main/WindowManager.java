@@ -3,13 +3,15 @@ package main;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 
 public class WindowManager {
-	private static String MAC_SCRIPT_PATH = "/maximize.scpt";
+	private static String MAC_SCRIPT_PATH = System.getProperty("user.dir") +  
+			File.separator + "maximize.scpt";
 	
 	public static void execute() {
 		String osType = System.getProperty("os.name").toLowerCase();
@@ -44,8 +46,9 @@ public class WindowManager {
 		
 		MAC(Arrays.asList("osascript " + MAC_SCRIPT_PATH)) {
 			@Override
-			void execute() {
+			void execute() {		
 				try {
+					System.out.println(SCRIPT.get(0));
 					Runtime.getRuntime().exec(SCRIPT.get(0));
 				} catch (IOException e) {
 					e.printStackTrace();

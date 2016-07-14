@@ -161,7 +161,7 @@ public class StartScreen extends JPanel {
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + executableName);
 			try {
-				proc.waitFor(3, TimeUnit.SECONDS); 
+				proc.waitFor(2, TimeUnit.SECONDS); 
 				//should handle case where user switches window
 			} catch (InterruptedException e) {
 				e.printStackTrace();
