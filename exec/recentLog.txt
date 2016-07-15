@@ -1,2 +1,3 @@
 /Users/samuellee/auto-test/resources/test.jar
 /Users/samuellee/auto-test/exec/exec.jar
+/Users/Ganguli/auto-test/resources/test.jar
