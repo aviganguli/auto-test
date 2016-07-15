@@ -78,7 +78,6 @@ public enum Log {
 			rLog.delete();
 			rLog.createNewFile();
 			PrintWriter fw = new PrintWriter(rLog);
-			System.out.println(uniquePaths);
 			for (String newPath : uniquePaths) {
 				fw.println(newPath);
 			}
