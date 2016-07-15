@@ -3,9 +3,7 @@ package main;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -13,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.net.URLClassLoader;
 
 
 /**
@@ -30,8 +26,8 @@ public enum Log {
 	//private final String FILE_PATH = "resources/config/";
 	private File rLog;
 	private final int LIMIT = 10;
-	private InputStream rLog_jar = null;
-	private Boolean read_jar = false ;
+	/* private InputStream rLog_jar = null;
+	private Boolean read_jar = false ; */
 	
 	/**
 	 * Singleton constructor 
@@ -49,17 +45,16 @@ public enum Log {
 			
 		}
 	
-		rLog_jar = getClass().getResourceAsStream( 
+		/* rLog_jar = getClass().getResourceAsStream( 
 				"/" + 
-				FILE_NAME);
-		System.out.println(rLog_jar);
+				FILE_NAME); */
 	}
 
 	
 	public void addToLog(String path) { 
 		//reads from jar during first run else read from rLog
-		try (Scanner scanner = (read_jar) ? new Scanner(rLog) : new Scanner(rLog_jar)) {
-			if(!read_jar) read_jar = true ;
+		try (Scanner scanner = /*!(read_jar) ? new Scanner(rLog_jar) : */ new Scanner(rLog)) {
+			//if(!read_jar) read_jar = true ;
 			//sets to true after first read
 			List<String> paths = new ArrayList<String>();
 			while (scanner.hasNextLine()) {
@@ -96,29 +91,9 @@ public enum Log {
 			
 	}
 	
-	public void updateJar() {
-		try {
-			Process proc = Runtime.getRuntime().exec("jar uf " + 
-					System.getProperty("user.dir") 
-					+ File.separator + "exec.jar recentLog.txt" );
-			  StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
-		        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
-		        in.start();
-		        err.start();
-			proc.waitFor(1, TimeUnit.SECONDS);
-			rLog.delete();
-					
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
 	
-	/*public List<String> readFromLog() {
+	
+	public List<String> readFromLog() {
 		
 		List<String> result = new ArrayList<String>();
 		
@@ -132,15 +107,32 @@ public enum Log {
 		}
 	
 		return result;
-	}*/
+	}
 	
+	/*  public void updateJar() {
+	try {
+		Process proc = Runtime.getRuntime().exec("jar uf " + 
+				System.getProperty("user.dir") 
+				+ File.separator + "exec.jar recentLog.txt" );
+		  StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
+	        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
+	        in.start();
+	        err.start();
+		proc.waitFor(1, TimeUnit.SECONDS);
+		rLog.delete();
+				
+	} catch (IOException e || InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
 	
 	public List<String> readFromLog() {
 		
 		List<String> result = new ArrayList<String>();
 		
 		try (Scanner scanner = (read_jar) ? new Scanner(rLog) : new Scanner(rLog_jar)) {
-			System.out.println(read_jar);
 			while (scanner.hasNextLine()) {
 				result.add(scanner.nextLine());
 			}
@@ -151,7 +143,7 @@ public enum Log {
 		rLog_jar = getClass().getResourceAsStream(File.separator + 
 				FILE_NAME);
 		return result;
-	}
+	}*/
 	
 }
 	 
