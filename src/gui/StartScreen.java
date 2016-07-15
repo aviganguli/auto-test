@@ -21,9 +21,9 @@ import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 
 import main.Log;
+import main.MouseManager;
 import main.StreamRedirector;
 import main.WindowManager;
-import main.mouseManager;
 
 /**
  * 
@@ -173,6 +173,7 @@ public class StartScreen extends JPanel {
 				throw new IllegalStateException("Application has the above error");
 		}
 		WindowManager.execute();
+		MouseManager.trackMouse();
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
@@ -180,7 +181,7 @@ public class StartScreen extends JPanel {
         err.start();
 	}
 	
-	public void updateOnClose() {
+	/*public void updateOnClose() {
 		recentLog.updateJar(); 	
-	}
+	}*/
 }
