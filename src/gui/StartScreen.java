@@ -173,7 +173,6 @@ public class StartScreen extends JPanel {
 				throw new IllegalStateException("Application has the above error");
 		}
 		WindowManager.execute();
-		MouseManager.trackMouse();
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
