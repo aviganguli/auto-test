@@ -1,8 +1,7 @@
 package gui;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
+import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -14,8 +13,8 @@ import javax.swing.SwingUtilities;
  */
 public class Main {
 	private static final String TITLE = "Auto-Test";
-	public static final String PATH =  System.getProperty("user.dir") +
-			"/resources/" ;
+	private static final String MAC_SCRIPT_PATH = System.getProperty("user.dir") +
+			"/enableAssistiveApp.scpt" ;
 	
 	/**
 	 * main runner
@@ -25,6 +24,12 @@ public class Main {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				try {
+					Runtime.getRuntime().exec("osascript " + MAC_SCRIPT_PATH);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new IllegalStateException("Scripts failed!");
+				}
 				JFrame app = new JFrame(TITLE);
 				final StartScreen start= new StartScreen(app);
 				start.setOpaque(true);
@@ -33,7 +38,7 @@ public class Main {
 				app.validate();
 				app.pack();
 				app.setVisible(true);
-				app.setResizable(true);			
+				app.setResizable(true);	
 			}
 		});
 	}

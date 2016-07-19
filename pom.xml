@@ -6,13 +6,6 @@
   <name>Auto Test</name>
   <description>Testing app
 </description>
-<dependencies>
-        <dependency>
-            <groupId>auto-test</groupId>
-            <artifactId>jython</artifactId>
-            <version>2.0</version>
-        </dependency>
-  </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -34,4 +27,17 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.1stleg</groupId>
+      <artifactId>jnativehook</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>group-c</groupId>
+          <artifactId>excluded-artifact</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
 </project>
