@@ -20,7 +20,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 
 import main.Log;
-import main.MouseManager;
+import main.Recorder;
 import main.StreamRedirector;
 import main.WindowManager;
 
@@ -161,7 +161,7 @@ public class StartScreen extends JPanel {
 		try {
 			proc = Runtime.getRuntime().exec("java -jar " + executableName);
 			try {
-				proc.waitFor(2, TimeUnit.SECONDS); 
+				proc.waitFor(3, TimeUnit.SECONDS); 
 				//should handle case where user switches window
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -172,7 +172,7 @@ public class StartScreen extends JPanel {
 				throw new IllegalStateException("Application has the above error");
 		}
 		WindowManager.execute();
-		MouseManager.trackMouse();
+		Recorder recorder = new Recorder();
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
