@@ -32,12 +32,6 @@
       <groupId>com.1stleg</groupId>
       <artifactId>jnativehook</artifactId>
       <version>1.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>group-c</groupId>
-          <artifactId>excluded-artifact</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>
