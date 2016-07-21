@@ -2,6 +2,7 @@ package main;
 
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.RenderingHints.Key;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,45 +78,77 @@ public class Recorder {
 			}
 
 			@Override
-			public void nativeKeyPressed(NativeKeyEvent e) {
-				if (e.isActionKey())
-					System.out.println(NativeKeyEvent.getKeyText(e.getKeyCode()));
+			public void nativeKeyTyped(NativeKeyEvent e) {
+				boolean upperCase = false ;
 				if (!e.isActionKey())  {
-					String charPressed = NativeKeyEvent.getKeyText(e.getKeyCode());
-					System.out.println("Key Pressed: " + charPressed);
-					if (charPressed.matches("[A-Za-z0-9]+")) {
-						String keyName = "VK_" + charPressed.toUpperCase();
+					String charTyped = new Character(e.getKeyChar()).toString();
+					if (Character.isUpperCase(charTyped.codePointAt(0))) {
+						upperCase = true ;
+					}
+					System.out.println("Key Typed: " + charTyped);
+					if (charTyped.matches("[A-Za-z0-9]+")) {
+						String keyName = "VK_" + charTyped.toUpperCase();
 			            try {
 							int keyCode = KeyEvent.class.getField(keyName).getInt(null);
-							recorded.add(new Tuple<Integer, Integer>(-1, keyCode));
+							if (upperCase) {
+								recorded.add(new Tuple<Integer, Integer>
+								(KeyEvent.KEY_PRESSED, KeyEvent.VK_SHIFT));
+							}
+							recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_PRESSED, keyCode));
+							if (upperCase) {
+								recorded.add(new Tuple<Integer, Integer>
+								(KeyEvent.KEY_RELEASED, KeyEvent.VK_SHIFT));
+							}
 						} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
 								| SecurityException e1) {
-							throw new IllegalArgumentException("Shouldn't happen. Global Listener error!");
+							throw new IllegalStateException("Could not parse key event!");
 						}
 					}
 					else {
-						recorded.add(new Tuple<Integer, Integer>(-1, keyMatch(e.getRawCode())));
+						recorded.add(new Tuple<Integer, Integer>
+						(KeyEvent.KEY_PRESSED, keyMatch(e.getRawCode())));
 					}
 				}
 			}
 
 			@Override
 			public void nativeKeyReleased(NativeKeyEvent e) {
-				if (e.isActionKey())  {
+				System.out.println("Release Key Raw: " + e.getRawCode());
+				if (isOnlyRelease(e.getRawCode())) {
+					recorded.add(new Tuple<Integer, Integer>
+					(KeyEvent.KEY_PRESSED, keyMatch(e.getRawCode())));
+				}
+				if (checkUndefined(e.getRawCode())) {
+					String keyName = "VK_" + NativeKeyEvent.getKeyText(e.getKeyCode()).toUpperCase();
+					int keyCode;
+					try {
+						keyCode = KeyEvent.class.getField(keyName).getInt(null);
+					} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+							| SecurityException e1) {
+						throw new IllegalStateException("Could not parse key event!");
+					}
+					recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyCode));
+					return;
+				}
+					recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyMatch(e.getRawCode())));
+					return;
+				}
+
+			@Override
+			public void nativeKeyPressed(NativeKeyEvent e) {
+				System.out.println("Key pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
+				System.out.println("Key pressed: " + e.getRawCode());
+				if (e.isActionKey() || (e.getRawCode() == 160 || e.getRawCode() == 131))  {
 					if (checkUndefined(e.getRawCode())) {
 						System.err.println("Could not recognize key");
 						return;
 					}
-					System.out.println("Release Key Raw: " + e.getRawCode());
-					recorded.add(new Tuple<Integer, Integer>(-1, keyMatch(e.getRawCode())));
-					return;
+					recorded.add(new Tuple<Integer, Integer>
+					(KeyEvent.KEY_PRESSED, keyMatch(e.getRawCode())));
 				}
 			}
-
-			@Override
-			public void nativeKeyTyped(NativeKeyEvent e) {
-			}
 		}
+	
 		
 		static public int keyMatch(int key) {
 			switch (key) {
@@ -158,10 +191,25 @@ public class Recorder {
 			default : return KeyEvent.CHAR_UNDEFINED;
 			}
 		}
+	
+		
+		static boolean isOnlyRelease(int key) {
+			switch (key) {
+				case 242 : return true ;
+				case 240 : return true ;
+				case 241 : return true ;
+				case 74 : return true ;
+				case 73 : return true ;
+				case 72 : return true ;
+				default : return false ;
+			}
+		}
+		
 		
 		static boolean checkUndefined(int rawCode) {
 			return (keyMatch(rawCode) == KeyEvent.CHAR_UNDEFINED) ;
 		}
 }
+		
 	
 	

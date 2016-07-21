@@ -1,1 +1,2 @@
 /Users/samuellee/auto-test/resources/test.jar
+/Users/Ganguli/auto-test/run/exec.jar
