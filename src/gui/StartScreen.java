@@ -39,6 +39,7 @@ public class StartScreen extends JPanel {
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
 	public final Log recentLog;
+	private Recorder recorder ;
 	
 	/**
 	 * Constructor for all components
@@ -172,7 +173,7 @@ public class StartScreen extends JPanel {
 				throw new IllegalStateException("Application has the above error");
 		}
 		WindowManager.execute();
-		Recorder recorder = new Recorder();
+		recorder = new Recorder(); //NEED TO CHANGE
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
@@ -183,4 +184,5 @@ public class StartScreen extends JPanel {
 	/*public void updateOnClose() {
 		recentLog.updateJar(); 	
 	}*/
+	
 }
