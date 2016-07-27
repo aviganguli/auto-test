@@ -2,6 +2,7 @@ package main;
 
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.Desktop.Action;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -50,7 +51,6 @@ public class Recorder {
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		removeAll();
@@ -132,114 +132,149 @@ public class Recorder {
 							throw new IllegalStateException("Could not parse key event!");
 						}
 					}
-					else {
-						recorded.add(new Tuple<Integer, Integer>
-						(KeyEvent.KEY_PRESSED, keyRawMatcher(e.getRawCode())));
-					}
 				}
 			}
 
 			@Override
 			public void nativeKeyReleased(NativeKeyEvent e) {
-				System.out.println("Release Key Raw: " + e.getRawCode());
+				System.out.println("Release Key Raw: " + e.getRawCode() + "CODE IS: " + e.getKeyCode());
 				if (isOnlyRelease(e.getRawCode())) {
 					recorded.add(new Tuple<Integer, Integer>
-					(KeyEvent.KEY_PRESSED, keyRawMatcher(e.getRawCode())));
+					(KeyEvent.KEY_PRESSED, keyCodeMatcher(e.getKeyCode())));
 				}
-				if (checkUndefined(e.getRawCode())) {
-					String keyName = "VK_" + NativeKeyEvent.getKeyText(e.getKeyCode()).toUpperCase();
-					int keyCode;
-					try {
-						keyCode = KeyEvent.class.getField(keyName).getInt(null);
-					} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-							| SecurityException e1) {
-						throw new IllegalStateException("Could not parse key event!");
+				//TODO: change following for key code
+				if (!e.isActionKey() ) {
+					if(e.getKeyCode() == 0) {
+						//handles F3 and F4
+						recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, 
+								specialKeyMatcher(e.getRawCode())));
+						return ;
 					}
-					recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyCode));
-					return;
+					String charTyped = NativeKeyEvent.getKeyText(e.getKeyCode());
+					System.out.println("Char typed: " + charTyped);
+					if (charTyped.matches("[A-Za-z]+")) {
+						String keyName = "VK_" + charTyped.toUpperCase();
+						int keyCode;
+						try {
+							keyCode = KeyEvent.class.getField(keyName).getInt(null);
+						} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+								| SecurityException e1) {
+							throw new IllegalStateException("Could not parse key event!");
+						}
+						recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyCode));
+						return;
+					}
 				}
-					recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyRawMatcher(e.getRawCode())));
-					return;
-				}
+				recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_RELEASED, keyCodeMatcher(e.getKeyCode())));
+				return;
+			}
 
 			@Override
 			public void nativeKeyPressed(NativeKeyEvent e) {
 				System.out.println("Key pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
-				System.out.println("Key pressed: " + e.getRawCode());
+				System.out.println("Key pressed: " + e.getRawCode() + " " + e.getKeyCode());
+				if (!e.isActionKey() && (!NativeKeyEvent.getKeyText(e.getKeyCode()).matches("[A-Za-z]+") || (NativeKeyEvent.getKeyText(e.getKeyCode()).length() > 1)) ) {
+					//if not action key and is not an alphabet
+					recorded.add(new Tuple<Integer, Integer>(KeyEvent.KEY_PRESSED, keyCodeMatcher(e.getKeyCode())));
+				}
+				//TODO: change following for key code
 				if (e.isActionKey() || (e.getRawCode() == 160 || e.getRawCode() == 131))  {
 					//or if F3 and F4
-					if (checkUndefined(e.getRawCode())) {
-						throw new IllegalStateException("Could not recognize key with raw code: " 
-								+ e.getRawCode());
+					if (checkUndefined(e.getKeyCode())) {
+						throw new IllegalStateException("Could not recognize key with key code: " 
+								+ e.getKeyCode());
 					}
+					//if e is F3 or F4 use specialKeyMatcher
+					int vk_code = (e.getKeyCode() == 0) ? specialKeyMatcher(e.getRawCode()) : keyCodeMatcher(e.getKeyCode());
 					recorded.add(new Tuple<Integer, Integer>
-					(KeyEvent.KEY_PRESSED, keyRawMatcher(e.getRawCode())));
+					(KeyEvent.KEY_PRESSED, vk_code));
 				}
 			}
 
 		}
 	
-		
-		static public int keyRawMatcher(int key) {
+		//Uses raw code to match keys 
+		static public int specialKeyMatcher(int rawCode) {
+			switch(rawCode) {
+				case 160 : return KeyEvent.VK_F3 ;
+				case 131 : return KeyEvent.VK_F4 ;
+				default : throw new IllegalStateException("Shouldn't happen raw code: " + rawCode) ;
+			}
+		}
+		static public int keyCodeMatcher(int key) {
 			switch (key) {
-			case 160 : return KeyEvent.VK_F3 ;
-			case 131 : return KeyEvent.VK_F4 ;
-			case 242 : return KeyEvent.VK_F7 ;
-			case 240 : return KeyEvent.VK_F8 ;
-			case 241 : return KeyEvent.VK_F9 ;
-			case 74 : return KeyEvent.VK_F10 ;
-			case 73 : return KeyEvent.VK_F11;
-			case 72 : return KeyEvent.VK_F12 ;
-			case 124 : return KeyEvent.VK_RIGHT ;
-			case 125 : return KeyEvent.VK_DOWN ;
-			case 123 : return KeyEvent.VK_LEFT ;
-			case 126 : return KeyEvent.VK_UP ;
-			//case 57 : return KeyEvent.VK_CAPS_LOCK ;
-			case 55 : return KeyEvent.VK_META ;
-			case 54 : return KeyEvent.VK_META ;
-			case 61 : return KeyEvent.VK_ALT ;
-			case 58 : return KeyEvent.VK_ALT ;
-			case 59 : return KeyEvent.VK_CONTROL ;
-			case 56 : return KeyEvent.VK_SHIFT ;
-			case 60 : return KeyEvent.VK_SHIFT ;
-			case 18 : return KeyEvent.VK_1 ;
-			case 19 : return KeyEvent.VK_2 ;
-			case 20 : return KeyEvent.VK_3 ;
-			case 21 : return KeyEvent.VK_4 ;
-			case 23 : return KeyEvent.VK_5 ;
-			case 22 : return KeyEvent.VK_6 ;
-			case 26 : return KeyEvent.VK_7 ;
-			case 28 : return KeyEvent.VK_8 ;
-			case 25 : return KeyEvent.VK_9 ;
-			case 29 : return KeyEvent.VK_0 ;
-			case 27 : return KeyEvent.VK_MINUS ; 
-			case 24 : return KeyEvent.VK_EQUALS ;
-			case 41 : return KeyEvent.VK_SEMICOLON ;
-			case 39 : return KeyEvent.VK_QUOTE ;
-			case 43 : return KeyEvent.VK_COMMA ;
-			case 47 : return KeyEvent.VK_PERIOD ;
-			case 44 : return KeyEvent.VK_SLASH ;
-			case 50 : return KeyEvent.VK_BACK_QUOTE ;
-			case 33 : return KeyEvent.VK_OPEN_BRACKET ;
-			case 30 : return KeyEvent.VK_CLOSE_BRACKET ;
-			case 42 : return KeyEvent.VK_BACK_SLASH ;
-			case 49 : return KeyEvent.VK_SPACE ;
-			case 53 : return KeyEvent.VK_ESCAPE ;
-			case 48 : return KeyEvent.VK_TAB ;
-			case 51 : return KeyEvent.VK_BACK_SPACE ;
-			case 36 : return KeyEvent.VK_ENTER ;
+			//ignores F3 and F4 as they have same undefined keyCode
+			case 59 : return KeyEvent.VK_F1 ; //fn + F1 on mac
+			case 60 : return KeyEvent.VK_F2 ; 
+			case 61 : return KeyEvent.VK_F3 ;
+			case 62 : return KeyEvent.VK_F4 ;
+			case 63 : return KeyEvent.VK_F5 ;
+			case 64 : return KeyEvent.VK_F6 ;
+			case 65 : return KeyEvent.VK_F7 ;
+			case 66 : return KeyEvent.VK_F8 ;
+			case 67 : return KeyEvent.VK_F9 ;
+			case 68 : return KeyEvent.VK_F10 ;
+			case 87 : return KeyEvent.VK_F11 ;
+			case 88 : return KeyEvent.VK_F12 ;
+			
+			// secondary functions 
+			/*case 57360 : return KeyEvent.VK_F7 ;
+			case 57378 : return KeyEvent.VK_F8 ;
+			case 57369 : return KeyEvent.VK_F9 ;
+			case 57376 : return 74 ;//KeyEvent.VK_F10 Mute ; 181
+			case 57390 : return 72 ; //KeyEvent.VK_F11 vol down; 182
+			case 57392 : return 73 ;//KeyEvent.VK_F12 vol up; 183
+*/			
+			case 57421 : return KeyEvent.VK_RIGHT ;
+			case 57424 : return KeyEvent.VK_DOWN ;
+			case 57419 : return KeyEvent.VK_LEFT ;
+			case 57416 : return KeyEvent.VK_UP ;
+			//case 58 : return KeyEvent.VK_CAPS_LOCK ;
+			case 3675 : return KeyEvent.VK_META ;
+			case 3676 : return KeyEvent.VK_META ; 
+			case 56 : return KeyEvent.VK_ALT ;
+			case 3640 : return KeyEvent.VK_ALT ; 
+			case 29 : return KeyEvent.VK_CONTROL ;
+			case 42 : return KeyEvent.VK_SHIFT ;
+			case 54 : return KeyEvent.VK_SHIFT ;
+			case 2 : return KeyEvent.VK_1 ;
+			case 3 : return KeyEvent.VK_2 ;
+			case 4 : return KeyEvent.VK_3 ;
+			case 5 : return KeyEvent.VK_4 ;
+			case 6 : return KeyEvent.VK_5 ;
+			case 7 : return KeyEvent.VK_6 ;
+			case 8 : return KeyEvent.VK_7 ;
+			case 9 : return KeyEvent.VK_8 ;
+			case 10 : return KeyEvent.VK_9 ;
+			case 11 : return KeyEvent.VK_0 ;
+			case 12 : return KeyEvent.VK_MINUS ; 
+			case 13 : return KeyEvent.VK_EQUALS ;
+			case 39 : return KeyEvent.VK_SEMICOLON ;
+			case 40 : return KeyEvent.VK_QUOTE ;
+			case 51 : return KeyEvent.VK_COMMA ;
+			case 52 : return KeyEvent.VK_PERIOD ;
+			case 53 : return KeyEvent.VK_SLASH ;
+			case 41 : return KeyEvent.VK_BACK_QUOTE ;
+			case 26 : return KeyEvent.VK_OPEN_BRACKET ;
+			case 27 : return KeyEvent.VK_CLOSE_BRACKET ;
+			case 43 : return KeyEvent.VK_BACK_SLASH ;
+			case 57 : return KeyEvent.VK_SPACE ;
+			case 1 : return KeyEvent.VK_ESCAPE ;
+			case 15 : return KeyEvent.VK_TAB ;
+			case 14 : return KeyEvent.VK_BACK_SPACE ;
+			case 28 : return KeyEvent.VK_ENTER ;
 			default : return KeyEvent.CHAR_UNDEFINED;
 			}
 		}
 		
 		static boolean isOnlyRelease(int key) {
 			switch (key) {
-				case 242 : return true ;
-				case 240 : return true ;
-				case 241 : return true ;
-				case 74 : return true ;
-				case 73 : return true ;
-				case 72 : return true ;
+				case 57360 : return true ;
+				case 57378 : return true ;
+				case 57369 : return true ;
+				case 57376 : return true ;
+				case 57390 : return true ;
+				case 57392 : return true ;
 				default : return false ;
 			}
 		}
@@ -256,8 +291,8 @@ public class Recorder {
 		}
 		
 		
-		static boolean checkUndefined(int rawCode) {
-			return (keyRawMatcher(rawCode) == KeyEvent.CHAR_UNDEFINED) ;
+		static boolean checkUndefined(int keyCode) {
+			return (keyCodeMatcher(keyCode) == KeyEvent.CHAR_UNDEFINED) && (keyCode != 0) ;
 		}
 		
 		public void playback() {
@@ -273,30 +308,30 @@ public class Recorder {
 				}
 				Integer info = (Integer) tuple.getSecond();
 				switch (event) {
-					case MouseEvent.MOUSE_PRESSED : 
+					case MouseEvent.MOUSE_PRESSED :
+						System.out.println(tuple);
 						robot.mousePress(info);
 						robot.delay(100);
-						System.out.println(tuple);
 						break;
-					case MouseEvent.MOUSE_RELEASED : 
+					case MouseEvent.MOUSE_RELEASED :
+						System.out.println(tuple);
 						robot.mouseRelease(info);
 						robot.delay(100);
-						System.out.println(tuple);
 						break;
 					case MouseEvent.MOUSE_WHEEL : 
+						System.out.println(tuple);
 						robot.mouseWheel(info);
 						robot.delay(100);
-						System.out.println(tuple);
 						break;
-					case KeyEvent.KEY_PRESSED : 
+					case KeyEvent.KEY_PRESSED :
+						System.out.println(tuple);
 						robot.keyPress(info);
 						robot.delay(100);
-						System.out.println(tuple);
 						break;
-					case KeyEvent.KEY_RELEASED : 
+					case KeyEvent.KEY_RELEASED :
+						System.out.println(tuple);
 						robot.keyRelease(info);
 						robot.delay(100);
-						System.out.println(tuple);
 						break;
 					default : throw new IllegalStateException("Event code : "  + event + " with info : " + info 
 							+ " not found!");
