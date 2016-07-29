@@ -58,6 +58,9 @@ public class StartScreen extends JPanel {
 		addApp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		addApp.addActionListener(new ActionListener() {
 			
+			/* 
+			 Handles file choosing and parsing
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -108,6 +111,9 @@ public class StartScreen extends JPanel {
 		recentApps.setMnemonic(KeyEvent.VK_R);
 		recentApps.addMenuListener(new MenuListener() {
 			
+			/*
+			 * Handles starting previously opened applications 
+			 */
 			@Override
 			public void menuSelected(MenuEvent e) {
 				List <String> recentPaths = recentLog.readFromLog();
@@ -149,7 +155,7 @@ public class StartScreen extends JPanel {
 	}
 	
 	/**
-	 * function that takes in the name of a jar file and runs it while 
+	 * Takes in the name of a jar file and runs it while 
 	 * redirecting its standard out and error
 	 * @param executableName the name of the file to be run
 	 */

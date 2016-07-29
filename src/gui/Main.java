@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 /**
  * Main class running my start screen
  * 
- * @author StrawHatJedi
+ * @author AvishekGanguli
  *
  */
 public class Main {

@@ -2,7 +2,7 @@ package main;
 
 /**
  * 
- * @author StrawHatJedi
+ * @author AvishekGanguli
  * Generic Tuple Class for two element tuples
  * @param <X> first element in tuple
  * @param <Y> second element in tuple
