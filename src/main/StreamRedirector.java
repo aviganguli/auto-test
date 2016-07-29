@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 /**
  * 
  * Redirects stream output to another output stream
- * @author StrawhatJedi
+ * @author AvishekGanguli
  */
 public class StreamRedirector extends Thread {
 	    private InputStream is;

@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  * 
- * @author samuellee & StrawhatJedi
+ * @author samuellee & AvishekGanguli
  * Create a new file log that contains 10 most recently used
  * file paths.  - Singleton Class
  * 
@@ -30,7 +30,7 @@ public enum Log {
 	private Boolean read_jar = false ; */
 	
 	/**
-	 * Singleton constructor 
+	 * Singleton constructor that makes a recentLog file if one doesn't exist 
 	 */
 	Log() {
 		this.rLog = new File(FILE_NAME);
@@ -50,7 +50,9 @@ public enum Log {
 				FILE_NAME); */
 	}
 
-	
+	/**
+	 * Adds a file path to recentLog file
+	 */
 	public void addToLog(String path) { 
 		//reads from jar during first run else read from rLog
 		try (Scanner scanner = /*!(read_jar) ? new Scanner(rLog_jar) : */ new Scanner(rLog)) {
@@ -91,7 +93,10 @@ public enum Log {
 	}
 	
 	
-	
+	/**
+	 * Returns a list to all file paths currently in the recentLog file
+	 * 
+	 */
 	public List<String> readFromLog() {
 		
 		List<String> result = new ArrayList<String>();
