@@ -5,7 +5,6 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -30,6 +29,8 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
 public class Recorder {
 	private Robot robot;
 	private ImitatorListener listener;
+	private boolean isRecording = false;
+	
 
 	/**
 	 * Removes logging from JNativeHook
@@ -59,11 +60,11 @@ public class Recorder {
 	
 	/**
 	 * 
-	 * @param recording
+	 * @param list to be played
 	 * 
 	 * Constructor to initialize class with a recording from previous runs
 	 */
-	public Recorder(List<Tuple<?, ?>> recording) {
+	public Recorder(BlockingArrayList<Tuple<?, ?>> recording) {
 		
 		this.listener = new ImitatorListener() ;
 		this.listener.setRecorded(recording);
@@ -105,12 +106,24 @@ public class Recorder {
 	}
 
 	public void start() {
+		listener.getRecorded().setBlock(true);
+		isRecording = false;
 		addAll();
 	}
 	
+	public void play() {
+		listener.getRecorded().setBlock(false);
+		isRecording = true;
+	}
+	
 	public void stop() {
+		isRecording = false;
 		removeAll();
-		playback(new ArrayList<>(listener.getRecorded()));
+	}
+	
+	public void pause() {
+		isRecording = false;
+		listener.getRecorded().setBlock(true);
 	}
 
 	public void playback(List<Tuple<?, ?>> recorded) {
@@ -157,19 +170,20 @@ public class Recorder {
 		}
 	}
 
-	public void removeAll() {
+	private void removeAll() {
 		GlobalScreen.removeNativeMouseListener(listener);
 		GlobalScreen.removeNativeMouseMotionListener(listener);
 		GlobalScreen.removeNativeKeyListener(listener);
 		GlobalScreen.removeNativeMouseWheelListener(listener);
 	}
 
-	public void addAll() {
+	private void addAll() {
 		GlobalScreen.addNativeMouseListener(listener);
 		GlobalScreen.addNativeMouseMotionListener(listener);
 		GlobalScreen.addNativeKeyListener(listener);
 		GlobalScreen.addNativeMouseWheelListener(listener);
 	}
+	
 
 	/**
 	 * 
@@ -184,12 +198,12 @@ public class Recorder {
 	 *
 	 */
 	class ImitatorListener implements NativeMouseInputListener, NativeKeyListener, NativeMouseWheelListener {
-		private List<Tuple<?, ?>> recorded;
+		private BlockingArrayList<Tuple<?, ?>> recorded;
 
 		public ImitatorListener() {
-			this.recorded = new ArrayList<>();
+			this.recorded = new BlockingArrayList<>();
 		}
-
+	
 		@Override
 		public void nativeMouseClicked(NativeMouseEvent e) {
 			System.out.println("Mouse Clicked: " + e.getClickCount());
@@ -480,11 +494,11 @@ public class Recorder {
 
 		}
 		
-		public  List<Tuple<?, ?>> getRecorded() {
+		public BlockingArrayList<Tuple<?, ?>> getRecorded() {
 			return recorded;
 		}
 		
-		public void setRecorded(List <Tuple<?, ?>> recording) {
+		public void setRecorded(BlockingArrayList <Tuple<?, ?>> recording) {
 			if(this.recorded != null) throw new IllegalStateException("Recorded should be null") ;
 			this.recorded = recording ;
 			return ;
