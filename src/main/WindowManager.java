@@ -13,7 +13,7 @@ import java.util.List;
  * @author samuellee & AvishekGanguli
  * 
  * Class used for maximizing a window launched by auto-test. Currently supports 
- * Mac, Windows and Linux.
+ * Mac, Windows and Linux. 
  *
  */
 public class WindowManager {
@@ -34,6 +34,12 @@ public class WindowManager {
 		}
 	}
 	
+	/**
+	 * 
+	 * @author samuellee & AvishekGanguli
+	 *
+	 * Short native scripts used to maximize an opened window. 
+	 */
 	private enum Scripts {
 		LINUX(Arrays.asList("")) {
 			@Override

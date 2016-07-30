@@ -22,6 +22,11 @@ public class StreamRedirector extends Thread {
 	        this.os=os;
 	    }
 
+	    /**
+	     *
+	     * Redirects stream from input to output. 
+	     * 
+	     */
 	    public void run() {
 	        try {
 	            InputStreamReader isr = new InputStreamReader(is);
