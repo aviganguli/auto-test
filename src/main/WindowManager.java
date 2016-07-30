@@ -8,7 +8,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * 
+ * @author samuellee & AvishekGanguli
+ * 
+ * Class used for maximizing a window launched by auto-test. Currently supports 
+ * Mac, Windows and Linux.
+ *
+ */
 public class WindowManager {
 	private static String MAC_SCRIPT_PATH = System.getProperty("user.dir") +  
 			File.separator + "maximize.scpt"; 
