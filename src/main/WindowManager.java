@@ -19,8 +19,7 @@ import java.util.List;
 public class WindowManager {
 	private static String MAC_SCRIPT_PATH = System.getProperty("user.dir") +  
 			File.separator + "maximize.scpt"; 
-			/*remember to have user allow access permissions.
-			currently uses folder method */
+			/* runs when permission to allow access permission for app*/
 	public static void execute() {
 		String osType = System.getProperty("os.name").toLowerCase();
 		if (osType.contains("mac")) {
@@ -51,7 +50,6 @@ public class WindowManager {
 			        rob.keyRelease(KeyEvent.VK_ALT);
 			        rob.keyRelease(KeyEvent.VK_F10);
 				} catch (AWTException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -81,7 +79,6 @@ public class WindowManager {
 			        rob.keyRelease(KeyEvent.VK_WINDOWS);
 			        rob.keyRelease(KeyEvent.VK_UP);
 				} catch (AWTException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
