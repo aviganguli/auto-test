@@ -55,7 +55,7 @@ public class Recorder {
 			System.err.println(ex.getMessage());
 			System.exit(1);
 		}
-		//debug_recorder();
+		debug_recorder();
 	}
 	
 	/**

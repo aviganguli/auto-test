@@ -1,7 +1,5 @@
 package gui;
 
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -9,12 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.imageio.ImageIO;
-import javax.print.DocFlavor.STRING;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -46,9 +38,6 @@ public class StartScreen extends JPanel {
 	private final String ADD_MENU_TITLE = "Add";
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
-	private final String PLAY_TOOLTIP = "Play recorded actions";
-	private final String PAUSE_TOOLTIP = "Pause recorded actions";
-	private final String STOP_TOOLTIP = "Stop recorded actions";
 	public final Log recentLog;
 	private Recorder recorder ;
 	
@@ -164,35 +153,6 @@ public class StartScreen extends JPanel {
 		startPanel.validate();
 		startPanel.setVisible(true);
 	}
-	
-	
-	private void populateButtons() {
-		JButton playButton = new JButton();
-		JButton pauseButton = new JButton();
-		JButton stopButton = new JButton();
-		try {
-			playButton.setIcon(new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/play.png"))));
-			pauseButton.setIcon(new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/pause.png"))));
-			stopButton.setIcon(new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/stop.png"))));
-		} catch (IOException e) {
-			throw new IllegalStateException("Could not populate buttons with images!");
-		}
-		playButton.setToolTipText(PLAY_TOOLTIP);
-		pauseButton.setToolTipText(PAUSE_TOOLTIP);
-		stopButton.setToolTipText(STOP_TOOLTIP);
-		playButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				
-			}
-		});
-	}
-	
 	
 	/**
 	 * Takes in the name of a jar file and runs it while 
