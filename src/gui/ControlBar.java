@@ -35,6 +35,7 @@ public class ControlBar extends JFrame {
 	private boolean isPaused;
 	private double MAX_WIDTH;
 	private double MAX_HEIGHT;
+	
 	public ControlBar(SequenceController controller) {
 		this.controller = controller;
 		this.isPaused = false;
@@ -54,11 +55,16 @@ public class ControlBar extends JFrame {
 		}
 		this.MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 		this.MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		this.add(populateButtons()) ; //adds JPanel to JFrame
 		setUndecorated(true);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		validate();
+		pack();
+		setVisible(true);
+		
 	}
-	private void populateButtons() {
+	private JPanel populateButtons() {
 		final JButton pauseButton = new JButton();
 		final JButton stopButton = new JButton();
 		final JButton ffButton = new JButton();
@@ -128,5 +134,8 @@ public class ControlBar extends JFrame {
 		validate();
 		pack();
 		setVisible(true);
+		return barPanel ;
 	}
+	
+	
 }
