@@ -26,14 +26,15 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * @author samuellee and AvishekGanguli
  *
  */
-public class Recorder {
+public class Recorder implements SequenceController {
 	private Robot robot;
 	private ImitatorListener listener;
 	private boolean isRecording = false;
 	
 
 	/**
-	 * Removes logging from JNativeHook
+	 * Removes logging from JNativeHook and instantiates a new recorder 
+	 * with no actions present
 	 */
 	public Recorder() {
 		this.listener = new ImitatorListener();
@@ -55,7 +56,7 @@ public class Recorder {
 			System.err.println(ex.getMessage());
 			System.exit(1);
 		}
-		debug_recorder();
+		//debug_recorder();
 	}
 	
 	/**
@@ -90,7 +91,7 @@ public class Recorder {
 		//debug_recorder();
 	}
 
-	private void debug_recorder() {
+	/*private void debug_recorder() {
 
 		addAll();
 		try {
@@ -103,7 +104,7 @@ public class Recorder {
 		System.out.println("Play started:" + recorded);
 		playback(recorded);
 		System.out.println("Play ended" + recorded);
-	}
+	}*/
 
 	public void start() {
 		listener.getRecorded().setBlock(true);
@@ -125,51 +126,20 @@ public class Recorder {
 		isRecording = false;
 		listener.getRecorded().setBlock(true);
 	}
-
-	public void playback(List<Tuple<?, ?>> recorded) {
-
-		for (Tuple<?, ?> tuple : recorded) {
-			Integer event = (Integer) tuple.getFirst();
-			if (event == MouseEvent.MOUSE_MOVED) {
-				// second element must be tuple as it is stored in that way
-				@SuppressWarnings("unchecked")
-				Tuple<Integer, Integer> info = (Tuple<Integer, Integer>) tuple.getSecond();
-				robot.mouseMove(info.getFirst(), info.getSecond());
-				continue;
-			}
-			Integer info = (Integer) tuple.getSecond();
-			switch (event) {
-			case MouseEvent.MOUSE_PRESSED:
-				System.out.println(tuple);
-				robot.mousePress(info);
-				robot.delay(100);
-				break;
-			case MouseEvent.MOUSE_RELEASED:
-				System.out.println(tuple);
-				robot.mouseRelease(info);
-				robot.delay(100);
-				break;
-			case MouseEvent.MOUSE_WHEEL:
-				System.out.println(tuple);
-				robot.mouseWheel(info);
-				robot.delay(100);
-				break;
-			case KeyEvent.KEY_PRESSED:
-				System.out.println(tuple);
-				robot.keyPress(info);
-				robot.delay(100);
-				break;
-			case KeyEvent.KEY_RELEASED:
-				System.out.println(tuple);
-				robot.keyRelease(info);
-				robot.delay(100);
-				break;
-			default:
-				throw new IllegalStateException("Event code : " + event + " with info : " + info + " not found!");
-			}
-		}
+	
+	@Override
+	public void rewind() {
+		// TODO Auto-generated method stub
+		
 	}
 
+	@Override
+	public void fastForward() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 	private void removeAll() {
 		GlobalScreen.removeNativeMouseListener(listener);
 		GlobalScreen.removeNativeMouseMotionListener(listener);
@@ -505,4 +475,5 @@ public class Recorder {
 		}
 
 	}
+
 }
