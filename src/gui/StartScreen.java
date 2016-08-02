@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileFilter;
 
 import main.Log;
 import main.Recorder;
+import main.SessionController;
 import main.StreamRedirector;
 import main.WindowManager;
 
@@ -38,8 +39,9 @@ public class StartScreen extends JPanel {
 	private final String ADD_MENU_TITLE = "Add";
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
-	public final Log recentLog;
-	private Recorder recorder ;
+	private final Log recentLog;
+	private boolean isRecording;
+	private String selectedFile;
 	
 	/**
 	 * Constructor for all components
@@ -124,7 +126,9 @@ public class StartScreen extends JPanel {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							
-							startProgram(recent.getText());
+							selectedFile=recent.getText();
+							isRecording = true;
+							beginSession();
 							
 						}
 					});
@@ -158,8 +162,9 @@ public class StartScreen extends JPanel {
 	 * Takes in the name of a jar file and runs it while 
 	 * redirecting its standard out and error
 	 * @param executableName the name of the file to be run
+	 * @return process being run
 	 */
-	private void startProgram(String executableName) {
+	private Process startProgram(String executableName) {
 		// Run a java app in a separate system process
         Process proc;
         String os_type = System.getProperty("os.name").toLowerCase() ;
@@ -178,13 +183,26 @@ public class StartScreen extends JPanel {
 				e1.printStackTrace();
 				throw new IllegalStateException("Application has the above error");
 		}
+		
 		WindowManager.execute();
-		recorder = new Recorder(); //NEED TO CHANGE
         // Then retrieve the process output
         StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
         StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
         in.start();
         err.start();
+        return proc;
+	}
+	
+	private void beginSession() {
+		if (isRecording) {
+			SessionController sessionController = new SessionController(new Recorder());
+			sessionController.start();
+			Process proc = startProgram(selectedFile);
+			while (proc.isAlive()) {
+				
+			}
+			sessionController.end();
+		}
 	}
 	
 	/*public void updateOnClose() {

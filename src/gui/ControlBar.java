@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.tools.Tool;
 
 import main.SequenceController;
 
@@ -33,38 +32,41 @@ public class ControlBar extends JFrame {
 	private final ImageIcon rewindIcon; 
 	private SequenceController controller;
 	private boolean isPaused;
-	private double MAX_WIDTH;
-	private double MAX_HEIGHT;
+
+	private static double MAX_WIDTH;
+	private static double MAX_HEIGHT;
+	public static final double BAR_WIDTH = MAX_WIDTH/12;
+	public static final double BAR_HEIGHT = MAX_WIDTH/10;
+	public static final double START_POSX = MAX_WIDTH/2-BAR_WIDTH/2;
+	public static final double START_POSY = MAX_HEIGHT-MAX_HEIGHT/8;
+	
+	
 	
 	public ControlBar(SequenceController controller) {
+		super();
 		this.controller = controller;
 		this.isPaused = false;
 		try {
 			this.playIcon = new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/play.png")));
+					ImageIO.read(getClass().getResource("/Icons/play.png")));
 			this.pauseIcon = new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/pause.png")));
+					ImageIO.read(getClass().getResource("/Icons/pause.png")));
 			this.stopIcon = new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/stop.png")));
+					ImageIO.read(getClass().getResource("/Icons/stop.png")));
 			this.ffIcon = new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/fastforward.png")));
+					ImageIO.read(getClass().getResource("/Icons/fastforward.png")));
 			this.rewindIcon = new ImageIcon(
-					ImageIO.read(getClass().getResource("Icons/rewind.png")));
+					ImageIO.read(getClass().getResource("/Icons/rewind.png")));
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find icons to display on buttons!");
 		}
 		this.MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 		this.MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-		this.add(populateButtons()) ; //adds JPanel to JFrame
-		setUndecorated(true);
-		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		validate();
-		pack();
-		setVisible(true);
-		
+		populateButtons();
 	}
-	private JPanel populateButtons() {
+	private void populateButtons() {
+		setUndecorated(true);
+		JPanel barPanel = new JPanel(new GridLayout(1, 0));
 		final JButton pauseButton = new JButton();
 		final JButton stopButton = new JButton();
 		final JButton ffButton = new JButton();
@@ -119,23 +121,29 @@ public class ControlBar extends JFrame {
 				controller.rewind();
 			}
 		});
-		JPanel barPanel = new JPanel();
-		barPanel.setLayout(new GridLayout(1, 0));
 		barPanel.add(rewindButton);
 		barPanel.add(pauseButton);
 		barPanel.add(ffButton);
 		barPanel.add(stopButton);
-		barPanel.setMaximumSize(new Dimension(new Double(MAX_WIDTH/12).intValue(), 
-				new Double(MAX_HEIGHT/10).intValue()));
+		barPanel.setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
+				new Double(BAR_HEIGHT).intValue()));
+		barPanel.validate();
+		barPanel.setVisible(true);
 		barPanel.setOpaque(true);
 		add(barPanel);
-		setLocation(new Double(MAX_HEIGHT/2-MAX_WIDTH/24).intValue(), 
-				new Double(MAX_HEIGHT-MAX_HEIGHT/8).intValue());
+		setLocation(new Double(START_POSX).intValue(), 
+				new Double(START_POSY).intValue());
+		setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
+				new Double(BAR_HEIGHT).intValue()));
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		validate();
+		revalidate();
 		pack();
 		setVisible(true);
-		return barPanel ;
 	}
-	
-	
+		
+	public void fade() {
+		FadeAnimation.fade(this);
+	}
 }
