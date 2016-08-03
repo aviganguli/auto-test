@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -32,17 +33,19 @@ public class ControlBar extends JFrame {
 	private final ImageIcon rewindIcon; 
 	private SequenceController controller;
 	private boolean isPaused;
-	private static double MAX_WIDTH;
-	private static double MAX_HEIGHT;
-	public static final double BAR_WIDTH = MAX_WIDTH/12;
-	public static final double BAR_HEIGHT = MAX_WIDTH/10;
-	public static final double START_POSX = MAX_WIDTH/2-BAR_WIDTH/2;
-	public static final double START_POSY = MAX_HEIGHT-MAX_HEIGHT/8;
+	private JPanel barPanel;
+	public static double MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	public static double MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	public static double BAR_WIDTH = MAX_WIDTH/12;
+	public static double BAR_HEIGHT = MAX_WIDTH/10;
+	public static double START_POSX = MAX_WIDTH/2;
+	public static double START_POSY = MAX_HEIGHT-MAX_HEIGHT/6;
 	
 	
 	
 	public ControlBar(SequenceController controller) {
 		super();
+		System.out.println("New Frame Created");
 		this.controller = controller;
 		this.isPaused = false;
 		try {
@@ -59,13 +62,28 @@ public class ControlBar extends JFrame {
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find icons to display on buttons!");
 		}
-		this.MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-		this.MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-		populateButtons();
-	}
-	private void populateButtons() {
 		setUndecorated(true);
-		JPanel barPanel = new JPanel(new GridLayout(1, 0));
+		pack();
+		validate();
+		populateButtons();
+		pack();
+		revalidate();
+		BAR_WIDTH = barPanel.getWidth();
+		BAR_HEIGHT = barPanel.getHeight();
+		START_POSX = MAX_WIDTH/2 - barPanel.getWidth()/2;
+		setLocation(new Double(START_POSX).intValue(), 
+				new Double(START_POSY).intValue());
+		setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
+				new Double(BAR_HEIGHT).intValue()));
+		revalidate();
+		pack();
+		setVisible(true);
+		toFront();
+	}
+	
+	
+	private void populateButtons() {
+		barPanel = new JPanel();
 		final JButton pauseButton = new JButton();
 		final JButton stopButton = new JButton();
 		final JButton ffButton = new JButton();
@@ -127,19 +145,11 @@ public class ControlBar extends JFrame {
 		barPanel.setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
 				new Double(BAR_HEIGHT).intValue()));
 		barPanel.validate();
+		barPanel.setOpaque(false);
 		barPanel.setVisible(true);
-		barPanel.setOpaque(true);
 		add(barPanel);
-		setLocation(new Double(START_POSX).intValue(), 
-				new Double(START_POSY).intValue());
-		setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
-				new Double(BAR_HEIGHT).intValue()));
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		validate();
-		revalidate();
-		pack();
-		setVisible(true);
 	}
 	
 	
