@@ -5,10 +5,9 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.SwingDispatchService;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
@@ -18,13 +17,14 @@ public class SessionController {
 	private SequenceController controller;
 	private ControlBar bar;
 	private BarListener listener;
-	private static final Tuple<Double, Double> HITBOX_X = new Tuple<Double,Double>(ControlBar.START_POSX - ControlBar.BAR_WIDTH,
-			ControlBar.START_POSX + ControlBar.BAR_WIDTH*2);
-	private static final Tuple<Double, Double> HITBOX_Y = new Tuple<Double,Double>(ControlBar.START_POSY - ControlBar.BAR_HEIGHT/2,
-			ControlBar.START_POSY + ControlBar.BAR_WIDTH*1.5);
+	private static final Tuple<Double, Double> HITBOX_X = new Tuple<Double,Double>(ControlBar.MAX_WIDTH/10,
+			ControlBar.MAX_WIDTH*.9);
+	private static final Tuple<Double, Double> HITBOX_Y = new Tuple<Double,Double>(ControlBar.START_POSY - ControlBar.BAR_HEIGHT,
+			ControlBar.MAX_HEIGHT);
 	private boolean isVisible;
 	
 	public SessionController(SequenceController controller) {
+		GlobalScreen.setEventDispatcher(new SwingDispatchService());
 		this.listener = new BarListener();
 		this.isVisible = false;
 		this.controller = controller;
@@ -44,8 +44,9 @@ public class SessionController {
 	}
 	
 	public void start() {
+		bar = new ControlBar(controller);	
 		addAll();
-		bar = new ControlBar(controller);
+
 	}
 	
 	public void end() {
@@ -88,20 +89,28 @@ public class SessionController {
 
 		@Override
 		public void nativeMouseMoved(NativeMouseEvent e) {
+			System.out.println(Thread.currentThread());
 			if (isInTriggerZone(e.getX(), e.getY()) && !isVisible) {
 				isVisible = true;
-				bar = new ControlBar(controller) ;
+				removeAll();
+				bar = new ControlBar(controller);
+				addAll();
+				System.out.println(Thread.currentThread());
 			}
+			//System.out.println("fade here" + isVisible + !isInTriggerZone(e.getX(), e.getY()));
 			if (!isInTriggerZone(e.getX(), e.getY()) && isVisible) {
+				removeAll();
+				System.out.println(Thread.currentThread());
 				bar.fade();
 				isVisible = false;
+				System.out.println(Thread.currentThread());
+				addAll();
 			}
 		}
 		
 		
 		private boolean isInTriggerZone(int x, int y) {
-			System.out.println("here");
-			return	( x > (HITBOX_X.getFirst()) && 
+			return	(x > (HITBOX_X.getFirst()) && 
 					x < (HITBOX_X.getSecond()) &&
 					y > (HITBOX_Y.getFirst()) && 
 					y < (HITBOX_Y.getSecond()));

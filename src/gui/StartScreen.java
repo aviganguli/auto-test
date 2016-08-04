@@ -201,6 +201,7 @@ public class StartScreen extends JPanel {
 			while (proc.isAlive()) {
 				
 			}
+			System.out.println("end");
 			sessionController.end();
 		}
 	}
