@@ -14,6 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.SwingDispatchService;
+
 import main.SequenceController;
 
 public class ControlBar extends JFrame {
@@ -45,7 +48,7 @@ public class ControlBar extends JFrame {
 	
 	public ControlBar(SequenceController controller) {
 		super();
-		System.out.println("New Frame Created");
+		System.out.println("New Control Bar Created" + Thread.currentThread());
 		this.controller = controller;
 		this.isPaused = false;
 		try {

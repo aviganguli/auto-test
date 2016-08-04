@@ -197,12 +197,15 @@ public class StartScreen extends JPanel {
 		if (isRecording) {
 			SessionController sessionController = new SessionController(new Recorder());
 			sessionController.start();
+			//Recorder rec = new Recorder() ;
+			//rec.start();
+			//rec.play();
 			Process proc = startProgram(selectedFile);
-			while (proc.isAlive()) {
+			/*while (proc.isAlive()) {
 				
-			}
-			System.out.println("end");
-			sessionController.end();
+			}*/
+			//System.out.println("end");
+			//sessionController.end();
 		}
 	}
 	
