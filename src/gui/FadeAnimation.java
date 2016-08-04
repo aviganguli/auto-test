@@ -3,6 +3,7 @@ package gui;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 public class FadeAnimation {
 	    private static final int TIME = 200;
@@ -15,7 +16,7 @@ public class FadeAnimation {
 	     */
 	    public static void fade(final JFrame frame)
 	    {
-	        frame.setOpacity(1f); // set opacity to 1 as we're fading out
+	        //frame.setOpacity(1f); // set opacity to 1 as we're fading out
 	        final Timer timer = new Timer();
 	        TimerTask timerTask = new TimerTask()
 	        {

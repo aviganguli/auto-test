@@ -45,13 +45,7 @@ public class SessionController {
 	
 	public void start() {
 		addAll();
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				bar=new ControlBar(controller);
-			}
-		});
+		bar = new ControlBar(controller);
 	}
 	
 	public void end() {
@@ -96,13 +90,7 @@ public class SessionController {
 		public void nativeMouseMoved(NativeMouseEvent e) {
 			if (isInTriggerZone(e.getX(), e.getY()) && !isVisible) {
 				isVisible = true;
-				SwingUtilities.invokeLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						bar=new ControlBar(controller);
-					}
-				});
+				bar = new ControlBar(controller) ;
 			}
 			if (!isInTriggerZone(e.getX(), e.getY()) && isVisible) {
 				bar.fade();
@@ -115,8 +103,8 @@ public class SessionController {
 			System.out.println("here");
 			return	( x > (HITBOX_X.getFirst()) && 
 					x < (HITBOX_X.getSecond()) &&
-					y < (HITBOX_Y.getFirst()) && 
-					y > (HITBOX_Y.getSecond()));
+					y > (HITBOX_Y.getFirst()) && 
+					y < (HITBOX_Y.getSecond()));
 		}
 	}
 	

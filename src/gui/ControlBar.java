@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import main.SequenceController;
@@ -65,7 +66,7 @@ public class ControlBar extends JFrame {
 		populateButtons();
 	}
 	private void populateButtons() {
-		setUndecorated(true);
+		//setUndecorated(true);
 		JPanel barPanel = new JPanel(new GridLayout(1, 0));
 		final JButton pauseButton = new JButton();
 		final JButton stopButton = new JButton();
