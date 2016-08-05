@@ -196,11 +196,17 @@ public class StartScreen extends JPanel {
 	private void beginSession() {
 		if (isRecording) {
 			SessionController sessionController = new SessionController(new Recorder());
-			sessionController.start();
 			//Recorder rec = new Recorder() ;
 			//rec.start();
 			//rec.play();
 			Process proc = startProgram(selectedFile);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sessionController.start();
 			/*while (proc.isAlive()) {
 				
 			}*/

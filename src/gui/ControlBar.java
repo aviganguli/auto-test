@@ -13,9 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.SwingDispatchService;
+import javax.swing.border.LineBorder;
 
 import main.SequenceController;
 
@@ -48,6 +46,7 @@ public class ControlBar extends JFrame {
 	
 	public ControlBar(SequenceController controller) {
 		super();
+		new JFrame();
 		System.out.println("New Control Bar Created" + Thread.currentThread());
 		this.controller = controller;
 		this.isPaused = false;
@@ -70,7 +69,7 @@ public class ControlBar extends JFrame {
 		validate();
 		populateButtons();
 		pack();
-		revalidate();
+		validate();
 		BAR_WIDTH = barPanel.getWidth();
 		BAR_HEIGHT = barPanel.getHeight();
 		START_POSX = MAX_WIDTH/2 - barPanel.getWidth()/2;
@@ -78,19 +77,41 @@ public class ControlBar extends JFrame {
 				new Double(START_POSY).intValue());
 		setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
 				new Double(BAR_HEIGHT).intValue()));
-		revalidate();
+		setAlwaysOnTop(true);
+		validate();
 		pack();
 		setVisible(true);
-		toFront();
+		//toFront();
 	}
 	
 	
 	private void populateButtons() {
 		barPanel = new JPanel();
+		setBackground(new Color(getBackground().getRed(),
+				getBackground().getGreen(), getBackground().getBlue(),
+				0));
+		barPanel.setBackground(new Color(getBackground().getRed(),
+				getBackground().getGreen(), getBackground().getBlue(),
+				0));
+		barPanel.setBorder(new LineBorder(new Color(getBackground().getRed(),
+				getBackground().getGreen(), getBackground().getBlue(),
+				0)));
 		final JButton pauseButton = new JButton();
 		final JButton stopButton = new JButton();
 		final JButton ffButton = new JButton();
 		final JButton rewindButton = new JButton();
+		pauseButton.setOpaque(false);
+		pauseButton.setContentAreaFilled(false);
+		pauseButton.setBorderPainted(false);
+		stopButton.setOpaque(false);
+		stopButton.setContentAreaFilled(false);
+		stopButton.setBorderPainted(false);
+		ffButton.setOpaque(false);
+		ffButton.setContentAreaFilled(false);
+		ffButton.setBorderPainted(false);
+		rewindButton.setOpaque(false);
+		rewindButton.setContentAreaFilled(false);
+		rewindButton.setBorderPainted(false);
 		pauseButton.setIcon(pauseIcon);
 		stopButton.setIcon(stopIcon);
 		ffButton.setIcon(ffIcon);
@@ -106,14 +127,24 @@ public class ControlBar extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (isPaused) {
 					controller.play();
+					barPanel.remove(pauseButton);
 					pauseButton.setIcon(pauseIcon);
 					pauseButton.setToolTipText(PAUSE_TOOLTIP);
+					pauseButton.setOpaque(false);
+					pauseButton.setContentAreaFilled(false);
+					pauseButton.setBorderPainted(false);
+					barPanel.add(pauseButton);
 					isPaused = false;
 					return;
 				} 
 				controller.pause();
+				barPanel.remove(pauseButton);
 				pauseButton.setIcon(playIcon);
 				pauseButton.setToolTipText(PLAY_TOOLTIP);
+				pauseButton.setOpaque(false);
+				pauseButton.setContentAreaFilled(false);
+				pauseButton.setBorderPainted(false);
+				barPanel.add(pauseButton);
 				isPaused = true;
 			}
 		});
@@ -148,10 +179,8 @@ public class ControlBar extends JFrame {
 		barPanel.setMaximumSize(new Dimension(new Double(BAR_WIDTH).intValue(), 
 				new Double(BAR_HEIGHT).intValue()));
 		barPanel.validate();
-		barPanel.setOpaque(false);
 		barPanel.setVisible(true);
 		add(barPanel);
-		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
