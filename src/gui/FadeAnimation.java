@@ -3,7 +3,6 @@ package gui;
 
 import javax.swing.JFrame;
 
-
 public class FadeAnimation {
 	    private static final int TIME = 200;
 	    private static final int MILLIS_PER_FRAME = 33;
@@ -22,13 +21,14 @@ public class FadeAnimation {
 	        	 opacity += delta; //tweak the opacity
 		        if (opacity < 0.1) //we're practically invisible now
 		        {
-		        	frame.dispose(); System.out.println(Thread.currentThread());
+		        	frame.dispose(); 
+		        	System.out.println("FADE" + Thread.currentThread());
 		            return;
 		        }
 		        else {
 		            frame.setOpacity(opacity);
 		            try {
-						Thread.sleep(250);
+						Thread.sleep(75);
 					} catch (InterruptedException e) {
 						throw new IllegalStateException("Animation failure!");
 					}
