@@ -1,7 +1,5 @@
 package main;
 
-import javax.swing.SwingUtilities;
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.SwingDispatchService;
@@ -18,6 +16,7 @@ public class SessionController implements NativeMouseInputListener {
 	private static final Tuple<Double, Double> HITBOX_Y = new Tuple<Double,Double>(ControlBar.START_POSY - ControlBar.BAR_HEIGHT,
 			ControlBar.MAX_HEIGHT);
 	private boolean isVisible;
+	private boolean isFirstRun;
 	
 	public SessionController(SequenceController controller) {
 		GlobalScreen.setEventDispatcher(new SwingDispatchService());
@@ -27,6 +26,7 @@ public class SessionController implements NativeMouseInputListener {
 	}
 	
 	public void start() {
+		isFirstRun = true;
 		addAll();
 
 		bar = new ControlBar(controller);	
@@ -82,12 +82,16 @@ public class SessionController implements NativeMouseInputListener {
 				System.out.println("MOUSE MOVED: " + Thread.currentThread());
 				if (isInTriggerZone(e.getX(), e.getY()) && !isVisible) {
 					isVisible = true;
-			
+					
+					if (isFirstRun) {
+						bar.dispose();
+						isFirstRun = false;
+					}
+					
 					bar = new ControlBar(controller);
 				}
 					
 				if (!isInTriggerZone(e.getX(), e.getY()) && isVisible) {
-					
 					bar.fade();
 					isVisible = false;
 				}
