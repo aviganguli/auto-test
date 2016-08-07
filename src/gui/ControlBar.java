@@ -2,12 +2,11 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
+import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import main.SequenceController;
+import main.SessionController;
 
 public class ControlBar extends JFrame {
 	/**
@@ -35,6 +35,7 @@ public class ControlBar extends JFrame {
 	private SequenceController controller;
 	private boolean isPaused;
 	private JPanel barPanel;
+	private Consumer<Boolean> setPaused;
 	public static double MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	public static double MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	public static double BAR_WIDTH = MAX_WIDTH/12;
@@ -44,12 +45,13 @@ public class ControlBar extends JFrame {
 	
 	
 	
-	public ControlBar(SequenceController controller) {
+	public ControlBar(SequenceController controller, SessionController sessionController) {
 		super();
 		new JFrame();
 		System.out.println("New Control Bar Created" + Thread.currentThread());
 		this.controller = controller;
-		this.isPaused = false;
+		this.isPaused = sessionController.isPaused();
+		this.setPaused = (x -> sessionController.setPaused(x));
 		try {
 			this.playIcon = new ImageIcon(
 					ImageIO.read(getClass().getResource("/Icons/play.png")));
@@ -81,7 +83,6 @@ public class ControlBar extends JFrame {
 		validate();
 		pack();
 		setVisible(true);
-		//toFront();
 	}
 	
 	
@@ -112,11 +113,21 @@ public class ControlBar extends JFrame {
 		rewindButton.setOpaque(false);
 		rewindButton.setContentAreaFilled(false);
 		rewindButton.setBorderPainted(false);
-		pauseButton.setIcon(pauseIcon);
+		if (!isPaused) {
+			pauseButton.setIcon(pauseIcon);
+		}
+		else {
+			pauseButton.setIcon(playIcon);
+		}
 		stopButton.setIcon(stopIcon);
 		ffButton.setIcon(ffIcon);
 		rewindButton.setIcon(rewindIcon);
-		pauseButton.setToolTipText(PAUSE_TOOLTIP);
+		if (!isPaused) {
+			pauseButton.setToolTipText(PAUSE_TOOLTIP);
+		}
+		else {
+			pauseButton.setToolTipText(PLAY_TOOLTIP);
+		}
 		stopButton.setToolTipText(STOP_TOOLTIP);
 		ffButton.setToolTipText(FASTFORWARD_TOOLTIP);
 		rewindButton.setToolTipText(REWIND_TOOLTIP);
@@ -135,6 +146,7 @@ public class ControlBar extends JFrame {
 					pauseButton.setBorderPainted(false);
 					barPanel.add(pauseButton);
 					isPaused = false;
+					setPaused.accept(isPaused);
 					return;
 				} 
 				controller.pause();
@@ -146,6 +158,7 @@ public class ControlBar extends JFrame {
 				pauseButton.setBorderPainted(false);
 				barPanel.add(pauseButton);
 				isPaused = true;
+				setPaused.accept(isPaused);
 			}
 		});
 		
@@ -188,4 +201,5 @@ public class ControlBar extends JFrame {
 	public void fade() {
 		FadeAnimation.fade(this);
 	}
+	
 }
