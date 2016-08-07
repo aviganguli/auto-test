@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -25,6 +27,8 @@ public class Main {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize() ;
+				System.out.println("Width = " + screenSize.getWidth() + " Height: " + screenSize.getHeight());
 				String osType = System.getProperty("os.name").toLowerCase();
 				if (osType.contains("mac")) {
 					try {

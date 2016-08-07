@@ -34,6 +34,7 @@ public class ControlBar extends JFrame {
 	private final ImageIcon rewindIcon; 
 	private SequenceController controller;
 	private boolean isPaused;
+
 	private JPanel barPanel;
 	private Consumer<Boolean> setPaused;
 	public static double MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
@@ -87,6 +88,7 @@ public class ControlBar extends JFrame {
 	
 	
 	private void populateButtons() {
+
 		barPanel = new JPanel();
 		setBackground(new Color(getBackground().getRed(),
 				getBackground().getGreen(), getBackground().getBlue(),
@@ -196,8 +198,7 @@ public class ControlBar extends JFrame {
 		add(barPanel);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
-	
+		
 	public void fade() {
 		FadeAnimation.fade(this);
 	}

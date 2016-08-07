@@ -201,9 +201,6 @@ public class StartScreen extends JPanel {
 	private void beginSession() {
 		if (isRecording) {
 			SessionController sessionController = new SessionController(new Recorder());
-			//Recorder rec = new Recorder() ;
-			//rec.start();
-			//rec.play();
 			Process proc = startProgram(selectedFile);
 			try {
 				Thread.sleep(600);

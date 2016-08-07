@@ -16,6 +16,7 @@ public class FadeAnimation {
 	     */
 	    public static void fade(final JFrame frame)
 	    {
+
 	    	float opacity =  1f;
 	        float delta = -DELTA;
 	        while (true) {
