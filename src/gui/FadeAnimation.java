@@ -1,6 +1,8 @@
 package gui;
 
 
+import java.awt.Frame;
+
 import javax.swing.JFrame;
 
 public class FadeAnimation {
@@ -21,6 +23,7 @@ public class FadeAnimation {
 	        	 opacity += delta; //tweak the opacity
 		        if (opacity < 0.1) //we're practically invisible now
 		        {
+		
 		        	frame.dispose(); 
 		        	System.out.println("FADE" + Thread.currentThread());
 		            return;
