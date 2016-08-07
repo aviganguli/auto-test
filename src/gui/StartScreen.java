@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +11,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -55,7 +60,7 @@ public class StartScreen extends JPanel {
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		this.recentLog = Log.RECENT;
 		this.startFrame = appFrame;
-		JPanel startPanel = new JPanel();
+		//JPanel startPanel = new JPanel();
 		//Build the first menu.
 		JMenu addMenu = new JMenu(ADD_MENU_TITLE);
 		addMenu.setMnemonic(KeyEvent.VK_A);
@@ -133,7 +138,7 @@ public class StartScreen extends JPanel {
 							
 							selectedFile=recent.getText();
 							isRecording = true;
-							beginSession();
+							//beginSession();
 							
 						}
 					});
@@ -154,14 +159,63 @@ public class StartScreen extends JPanel {
 				
 			}
 		});
+		
+		
+		
+		createModeButtons() ; //creates play and record buttons in startScreen panel
 		addMenu.add(addApp);
 		addMenu.add(recentApps);
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(addMenu);
 		startFrame.setJMenuBar(menuBar);
-		startPanel.validate();
-		startPanel.setVisible(true);
+		validate();
+		setVisible(true);
+		//startPanel.validate();
+		//startPanel.setVisible(true);
 	}
+	
+	
+	private void createModeButtons() {
+		ImageIcon playIcon ;
+		ImageIcon recordIcon ;
+		try {
+			playIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/playMode.png")));
+			recordIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/recordMode.png"))) ;	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new IllegalStateException("Image not found") ;
+		}	
+		JButton playButton = new JButton(playIcon) ;
+		JButton recordButton = new JButton(recordIcon) ;
+		playButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				beginSession();
+				
+			}
+		});
+		recordButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				beginSession(); 
+				
+			}
+		});
+		
+		
+		GridLayout grid = new GridLayout(1, 2) ;
+		grid.setHgap(5);
+		this.setLayout(grid);
+		this.add(playButton) ;
+		this.add(recordButton) ;
+		
+		
+		
+		
+	}
+	
 	
 	/**
 	 * Takes in the name of a jar file and runs it while 
