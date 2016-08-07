@@ -17,9 +17,11 @@ public class SessionController implements NativeMouseInputListener {
 			ControlBar.MAX_HEIGHT);
 	private boolean isVisible;
 	private boolean isFirstRun;
+	private boolean isPaused;
 	
 	public SessionController(SequenceController controller) {
 		GlobalScreen.setEventDispatcher(new SwingDispatchService());
+		this.isPaused = true;
 		this.isVisible = false;
 		this.controller = controller;
 		System.out.println("CONS: " + Thread.currentThread());
@@ -28,7 +30,7 @@ public class SessionController implements NativeMouseInputListener {
 	public void start() {
 		isFirstRun = true;
 		addAll();
-		bar = new ControlBar(controller);	
+		bar = new ControlBar(controller, this);	
 	}
 	
 	public void end() {
@@ -41,7 +43,6 @@ public class SessionController implements NativeMouseInputListener {
 		try {
 			GlobalScreen.unregisterNativeHook();
 		} catch (NativeHookException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -51,7 +52,14 @@ public class SessionController implements NativeMouseInputListener {
 		GlobalScreen.addNativeMouseMotionListener(this);
 	}
 	
-
+	public void setPaused(boolean isPaused) {
+		this.isPaused = isPaused;
+	}
+	
+	public boolean isPaused() {
+		return isPaused;
+	}
+	
 	@Override
 	public void nativeMouseClicked(NativeMouseEvent e) {
 		return;
@@ -76,9 +84,6 @@ public class SessionController implements NativeMouseInputListener {
 
 	@Override
 	public void nativeMouseMoved(NativeMouseEvent e) {
-			
-			
-				System.out.println("MOUSE MOVED: " + Thread.currentThread());
 				if (isInTriggerZone(e.getX(), e.getY()) && !isVisible) {
 					isVisible = true;
 					
@@ -86,8 +91,7 @@ public class SessionController implements NativeMouseInputListener {
 						bar.dispose();
 						isFirstRun = false;
 					}
-					
-					bar = new ControlBar(controller);
+					bar = new ControlBar(controller,this);
 				}
 					
 				if (!isInTriggerZone(e.getX(), e.getY()) && isVisible) {

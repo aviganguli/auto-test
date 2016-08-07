@@ -1,11 +1,14 @@
 package gui;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -42,14 +45,16 @@ public class StartScreen extends JPanel {
 	private final Log recentLog;
 	private boolean isRecording;
 	private String selectedFile;
+	private ExecutorService executorService;
 	
 	/**
 	 * Constructor for all components
-	 * @param gameFrame frame game runs in
+	 * @param appFrame frame app runs in
 	 */
-	StartScreen(JFrame gameFrame) {
+	StartScreen(JFrame appFrame) {
+		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		this.recentLog = Log.RECENT;
-		this.startFrame = gameFrame;
+		this.startFrame = appFrame;
 		JPanel startPanel = new JPanel();
 		//Build the first menu.
 		JMenu addMenu = new JMenu(ADD_MENU_TITLE);
@@ -204,16 +209,20 @@ public class StartScreen extends JPanel {
 				e.printStackTrace();
 			}
 			sessionController.start();
-			/*while (proc.isAlive()) {
+			startFrame.setState(Frame.ICONIFIED);
+			executorService.submit(new Runnable() {
 				
-			}*/
-			//System.out.println("end");
-			//sessionController.end();
+				@Override
+				public void run() {
+					while (proc.isAlive()) {
+						
+					}
+					System.out.println("end");
+					sessionController.end();
+					startFrame.setState(Frame.NORMAL);
+					System.out.println("ended");
+				}
+			});
 		}
 	}
-	
-	/*public void updateOnClose() {
-		recentLog.updateJar(); 	
-	}*/
-	
 }
