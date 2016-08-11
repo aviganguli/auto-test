@@ -6,7 +6,6 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -22,18 +21,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -56,11 +58,12 @@ public class StartScreen extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame startFrame;
-	private final String ADD_MENU_TITLE = "Add";
+	private final String FILE_MENU_TITLE = "File";
 	private final String ADD_APP_ITEM = "New Application";
 	private final String RECENT_APP_ITEM = "Recent Applications";
 	private final String RECORD_TOOLTIP = "Begin recording the selected file";
 	private final String PLAY_TOOLTIP = "Begin playing the selected recording";
+	private final String CLEAR_TOOLTIP = "Clear the console";
 	private static Log recentLog;
 	private boolean isRecording;
 	private String selectedFile;
@@ -69,6 +72,11 @@ public class StartScreen extends JPanel {
 	private JTextArea errorBox;
 	private JTextPane playText;
 	private JTextPane recordText;
+	private int numTabs;
+	private int totalNumTabs;
+	private JTabbedPane tabbedPane;
+	private boolean isFirstRun;
+	private ImageIcon closeIcon;
 	
 	
 	/**
@@ -77,9 +85,22 @@ public class StartScreen extends JPanel {
 	 */
 	StartScreen(JFrame appFrame) {
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		this.recentLog = Log.RECENT;
+		recentLog = Log.RECENT;
 		this.startFrame = appFrame;
+		this.isFirstRun = true;
 		this.isSelected = false;
+		this.numTabs = 0;
+		this.totalNumTabs = 0;
+		this.tabbedPane = new JTabbedPane();
+		tabbedPane.setUI(new BasicTabbedPaneUI() {
+			protected void paintContentBorder(Graphics g, int intPlacement, int selected) {}  
+		});
+		//tabbedPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+		try {
+			closeIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/close.png")));
+		} catch (IOException e) {
+			throw new IllegalStateException("Cannot find icons to display on buttons!") ;
+		}
 		setLayout(new BorderLayout());
 		this.playText = new JTextPane();
 		this.recordText = new JTextPane();
@@ -101,7 +122,7 @@ public class StartScreen extends JPanel {
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
 		doc.setParagraphAttributes(0, doc.getLength(), center, false);
 		//Build the first menu.
-		JMenu addMenu = new JMenu(ADD_MENU_TITLE);
+		JMenu addMenu = new JMenu(FILE_MENU_TITLE);
 		addMenu.setMnemonic(KeyEvent.VK_A);
 		addMenu.getAccessibleContext().setAccessibleDescription(
 		        "Adds applications to test");
@@ -157,6 +178,7 @@ public class StartScreen extends JPanel {
 		});
 		
 		createErrorDisplay(); //creates error display box
+		add(tabbedPane, BorderLayout.CENTER);
 		createModeButtons() ; //creates play and record buttons in startScreen panel
 		addMenu.add(addApp);
 		addMenu.add(recentApps);
@@ -169,11 +191,41 @@ public class StartScreen extends JPanel {
 	
 	
 	private void createErrorDisplay() {
+		numTabs++;
+		totalNumTabs++;
 		errorBox = new JTextArea();
 		errorBox.setEditable(false);
 		errorBox.setLineWrap (false);
 		JScrollPane scrollBox = new JScrollPane(errorBox);
-		add(scrollBox,BorderLayout.CENTER);
+		JPanel errorPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints constraints = new GridBagConstraints();
+		ImageIcon clearIcon;
+		try {
+			clearIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/clear.gif")));
+		} catch (IOException e) {
+			throw new IllegalStateException("Cannot find icons to display on buttons!") ;
+		}
+		JButton clearButton = new JButton(clearIcon);
+		clearButton.addActionListener((e) -> errorBox.setText(""));
+		clearButton.setOpaque(false);
+		clearButton.setContentAreaFilled(false);
+		clearButton.setBorderPainted(false);
+		clearButton.setToolTipText(CLEAR_TOOLTIP);
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		constraints.weightx = 0;
+		constraints.weighty = 0;
+		constraints.anchor = GridBagConstraints.NORTH;
+		errorPanel.add(clearButton, constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.weightx = 1;
+		constraints.weighty = 1;
+		constraints.fill = GridBagConstraints.BOTH;
+		errorPanel.add(scrollBox, constraints);
+		tabbedPane.addTab("Tab " + totalNumTabs, errorPanel);
+		tabbedPane.setTabComponentAt(numTabs-1, getTitlePanel(tabbedPane, errorPanel, "Tab " + totalNumTabs));
+		tabbedPane.setOpaque(false);
 	}
 	
 	private void createModeButtons() {
@@ -290,6 +342,10 @@ public class StartScreen extends JPanel {
 	
 	private void beginSession() {
 		if (isRecording) {
+			if (!isFirstRun) {
+				createErrorDisplay();
+			}
+			isFirstRun = false;
 			SessionController sessionController = new SessionController(new Recorder());
 			Process proc = startProgram(selectedFile);
 			try {
@@ -316,6 +372,35 @@ public class StartScreen extends JPanel {
 			});
 		}
 	}
+	
+	public JPanel getTitlePanel(final JTabbedPane tabbedPane, final JPanel panel, String title)
+	 {
+	  JPanel titlePanel = new JPanel(new GridBagLayout());
+	  GridBagConstraints constraints = new GridBagConstraints();
+	  titlePanel.setOpaque(false);
+	  JLabel titleLabel = new JLabel(title);
+	  constraints.anchor = GridBagConstraints.CENTER;
+	  constraints.gridx = 0;
+	  constraints.gridy = 0;
+	  
+	  titlePanel.add(titleLabel, constraints);
+	  JButton closeButton = new JButton(closeIcon);
+	  closeButton.setOpaque(false);
+	  closeButton.setContentAreaFilled(false);
+	  closeButton.setBorderPainted(false);
+	  closeButton.addActionListener((e) ->  {
+		  if (numTabs == 1) return; 
+		  else  {
+			  tabbedPane.remove(panel);
+			  numTabs--;
+		  }
+	  });
+	  constraints.anchor = GridBagConstraints.NORTHEAST;
+	  constraints.gridx = 1;
+	  constraints.gridy = 0;
+	  titlePanel.add(closeButton, constraints);
+	  return titlePanel;
+	 }
 		
 	/** 
 	 Handles file choosing and parsing

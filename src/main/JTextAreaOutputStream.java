@@ -16,7 +16,7 @@ public class JTextAreaOutputStream extends OutputStream {
 
 	@Override
 	public void write(int b) throws IOException {
-		destination.append(new Character((char) b).toString());
+		destination.append(String.valueOf((char)b));
 	}
 
 }
