@@ -34,6 +34,9 @@ public class SessionController implements NativeMouseInputListener {
 	}
 	
 	public void end() {
+		if (isFirstRun) {
+			bar.dispose();
+		}
 		removeAll();
 	}
 	

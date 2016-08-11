@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import javax.swing.event.ListSelectionEvent;
+
 
 /**
  * 
@@ -109,7 +111,7 @@ public enum Log {
 		} catch (FileNotFoundException e) {
 			throw new IllegalStateException("Log file should already exist.");
 		}
-	
+		Collections.reverse(result);
 		return result;
 	}
 	

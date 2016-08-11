@@ -28,8 +28,6 @@ public class Main {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize() ;
-				System.out.println("Width = " + screenSize.getWidth() + " Height: " + screenSize.getHeight());
 				String osType = System.getProperty("os.name").toLowerCase();
 				if (osType.contains("mac")) {
 					try {
@@ -40,6 +38,8 @@ public class Main {
 					}
 				}
 				JFrame app = new JFrame(TITLE);
+				Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+				app.setMinimumSize(new Dimension((int)Math.round(dimension.getWidth()*0.5), (int)Math.round(dimension.getHeight()*.5)));
 				final StartScreen start = new StartScreen(app);
 				start.setOpaque(true);
 				app.add(start);
