@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
+
+import com.apple.laf.AquaTabbedPaneContrastUI;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -32,9 +34,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -92,9 +96,17 @@ public class StartScreen extends JPanel {
 		this.numTabs = 0;
 		this.totalNumTabs = 0;
 		this.tabbedPane = new JTabbedPane();
-		tabbedPane.setUI(new BasicTabbedPaneUI() {
-			protected void paintContentBorder(Graphics g, int intPlacement, int selected) {}  
-		});
+		
+		tabbedPane.setUI(new AquaTabbedPaneContrastUI() {
+			@Override
+			protected void paintContentBorder(Graphics arg0, int arg1, int arg2) {
+				{}
+			}
+		});/*
+		UIManager.put("TabbedPane.contentOpaque", Boolean.FALSE) ;
+		
+		tabbedPane.setOpaque(false);*/
+		
 		//tabbedPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		try {
 			closeIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/close.png")));
@@ -225,7 +237,6 @@ public class StartScreen extends JPanel {
 		errorPanel.add(scrollBox, constraints);
 		tabbedPane.addTab("Tab " + totalNumTabs, errorPanel);
 		tabbedPane.setTabComponentAt(numTabs-1, getTitlePanel(tabbedPane, errorPanel, "Tab " + totalNumTabs));
-		tabbedPane.setOpaque(false);
 	}
 	
 	private void createModeButtons() {
