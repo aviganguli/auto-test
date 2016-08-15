@@ -44,7 +44,9 @@ import com.apple.laf.AquaTabbedPaneUI;
 
 import main.JTextAreaOutputStream;
 import main.Log;
+import main.Player;
 import main.Recorder;
+import main.SequenceController;
 import main.SessionController;
 import main.StreamRedirector;
 import main.WindowManager;
@@ -61,16 +63,21 @@ public class StartScreen extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JFrame startFrame;
 	private final String FILE_MENU_TITLE = "File";
-	private final String ADD_APP_ITEM = "New Application";
-	private final String RECENT_APP_ITEM = "Recent Applications";
+	private final String ADD_APP_ITEM = "New";
+	private final String RECENT_APP_ITEM = "Recent";
 	private final String RECORD_TOOLTIP = "Begin recording the selected file";
 	private final String PLAY_TOOLTIP = "Begin playing the selected recording";
 	private final String CLEAR_TOOLTIP = "Clear the console";
-	private static Log recentLog;
+	private final String RECORD_MENU_ITEM = "Recording";
+	private final String PLAY_MENU_ITEM = "Playback";
+	private static Log recentJARLog;
+	private static Log recentRCDRLog;
 	private boolean isRecording;
-	private String selectedFile;
+	private String selectedJARFile;
+	private String  selectedRCDRFile;
 	private ExecutorService executorService;
-	private boolean isSelected;
+	private boolean isSelectedJARFile;
+	private boolean isSelectedRCDRFile;
 	private JTextArea errorBox;
 	private JTextPane playText;
 	private JTextPane recordText;
@@ -88,15 +95,18 @@ public class StartScreen extends JPanel {
 	 */
 	StartScreen(JFrame appFrame) {
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		recentLog = Log.RECENT;
+		recentJARLog = Log.JAR;
+		recentRCDRLog = Log.RCDR;
 		this.OS_TYPE = System.getProperty("os.name").toLowerCase() ;
 		this.startFrame = appFrame;
 		this.isFirstRun = true;
-		this.isSelected = false;
+		this.isSelectedJARFile = false;
+		this.isSelectedRCDRFile = false;
 		this.numTabs = 0;
 		this.totalNumTabs = 0;
 		this.tabbedPane = new JTabbedPane();
-		if(OS_TYPE.contains("mac")){
+		if(OS_TYPE.contains("mac")){ 
+			// for Mac
 			tabbedPane.setUI(new AquaTabbedPaneUI() {
 				@Override
 				protected void paintContentBorder(Graphics arg0, int arg1, int arg2) {
@@ -104,7 +114,8 @@ public class StartScreen extends JPanel {
 				}
 			});
 		}
-		else { //windows or linux os
+		else { 
+			// For Windows or Linux 
 			tabbedPane.setUI(new BasicTabbedPaneUI()  {
 				@Override
 				protected void paintContentBorder(Graphics arg0, int arg1, int arg2) {
@@ -138,70 +149,53 @@ public class StartScreen extends JPanel {
 		center = new SimpleAttributeSet();
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
 		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		JMenu recordingMenu = new JMenu(RECORD_MENU_ITEM);
+		recordingMenu.setMnemonic(KeyEvent.VK_R);
+		JMenu playerMenu = new JMenu(PLAY_MENU_ITEM);
+		playerMenu.setMnemonic(KeyEvent.VK_P);
 		//Build the first menu.
-		JMenu addMenu = new JMenu(FILE_MENU_TITLE);
-		addMenu.setMnemonic(KeyEvent.VK_A);
-		addMenu.getAccessibleContext().setAccessibleDescription(
+		JMenu fileMenu = new JMenu(FILE_MENU_TITLE);
+		fileMenu.setMnemonic(KeyEvent.VK_A);
+		fileMenu.getAccessibleContext().setAccessibleDescription(
 		        "Adds applications to test");
-		final JMenuItem addApp = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
-		addApp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
-		addApp.addActionListener(new ActionListener() {
+		final JMenuItem addRecordItem = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
+		addRecordItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		addRecordItem.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				FileSelect fileSelect = new FileSelect(addApp);
+				JARFileSelect fileSelect = new JARFileSelect(addRecordItem);
 				fileSelect.listen(e);		
 			}
 		});
-		final JMenu recentApps = new JMenu(RECENT_APP_ITEM);
-		recentApps.setMnemonic(KeyEvent.VK_R);
-		recentApps.addMenuListener(new MenuListener() {
-			
-			/*
-			 * Handles starting previously opened applications 
-			 */
-			@Override
-			public void menuSelected(MenuEvent e) {
-				List <String> recentPaths = recentLog.readFromLog();
-				for (String path : recentPaths) {
-					final JMenuItem recent = new JMenuItem(path);
-					recent.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							selectedFile=recent.getText();
-							recentLog.addToLog(recent.getText());
-							isRecording = true;
-							isSelected = true;
-							recordText.setText(selectedFile);
-						}
-					});
-					recentApps.add(recent);
-				}
-				
-			}
+		JMenu recentRecordItem = new JMenu(RECENT_APP_ITEM);
+		recentRecordItem.setMnemonic(KeyEvent.VK_R);
+		recentRecordItem.addMenuListener(new RecentJARMenuListener(recentRecordItem));
+		recordingMenu.add(addRecordItem);
+		recordingMenu.add(recentRecordItem);
+		final JMenuItem addPlayItem = new JMenuItem(ADD_APP_ITEM,KeyEvent.VK_N);
+		addPlayItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		addPlayItem.addActionListener(new ActionListener() {
 			
 			@Override
-			public void menuDeselected(MenuEvent e) {
-				recentApps.removeAll();
-				
-			}
-			
-			@Override
-			public void menuCanceled(MenuEvent e) {
-				// do nothing
-				
+			public void actionPerformed(ActionEvent e) {
+				RCDRFileSelect fileSelect = new RCDRFileSelect(addPlayItem);
+				fileSelect.listen(e);		
 			}
 		});
-		
+		JMenu recentPlayItem = new JMenu(RECENT_APP_ITEM);
+		recentPlayItem.setMnemonic(KeyEvent.VK_R);
+		recentPlayItem.addMenuListener(new RecentRCDRMenuListener(recentPlayItem));
+		playerMenu.add(addPlayItem);
+		playerMenu.add(recentPlayItem);
+		fileMenu.add(recordingMenu);
+		fileMenu.add(playerMenu);
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.add(fileMenu);
+		startFrame.setJMenuBar(menuBar);
 		createErrorDisplay(); //creates error display box
 		add(tabbedPane, BorderLayout.CENTER);
 		createModeButtons() ; //creates play and record buttons in startScreen panel
-		addMenu.add(addApp);
-		addMenu.add(recentApps);
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(addMenu);
-		startFrame.setJMenuBar(menuBar);
 		validate();
 		setVisible(true);
 	}
@@ -255,21 +249,21 @@ public class StartScreen extends JPanel {
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find icons to display on buttons!") ;
 		}	
-		JButton playButton = new JButton(playIcon) ;
+		JButton playerButton = new JButton(playIcon) ;
 		JButton recordButton = new JButton(recordIcon) ;
-		playButton.setToolTipText(PLAY_TOOLTIP);
+		playerButton.setToolTipText(PLAY_TOOLTIP);
 		recordButton.setToolTipText(RECORD_TOOLTIP);
-		playButton.setOpaque(false);
-		playButton.setContentAreaFilled(false);
-		playButton.setBorderPainted(false);
+		playerButton.setOpaque(false);
+		playerButton.setContentAreaFilled(false);
+		playerButton.setBorderPainted(false);
 		recordButton.setOpaque(false);
 		recordButton.setContentAreaFilled(false);
 		recordButton.setBorderPainted(false);
-		playButton.addActionListener(new ActionListener() {
+		playerButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!isSelected) {
+				if (!isSelectedRCDRFile) {
 					JOptionPane.showMessageDialog(startFrame,
 						    "Please select a recording.",
 						    "Auto-Test: Warning",
@@ -284,12 +278,12 @@ public class StartScreen extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!isSelected) {
+				if (!isSelectedJARFile) {
 					JOptionPane.showMessageDialog(startFrame,
 						    "Please select a file.",
 						    "Auto-Test: Warning",
 						    JOptionPane.WARNING_MESSAGE);
-					FileSelect fileSelect = new FileSelect(recordButton);
+					JARFileSelect fileSelect = new JARFileSelect(recordButton);
 					fileSelect.listen(e);
 					return;
 				}
@@ -299,11 +293,11 @@ public class StartScreen extends JPanel {
 		});
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		buttonPanel.add(playButton, constraints);
+		buttonPanel.add(playerButton, constraints);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		buttonPanel.add(recordButton, constraints);
-		playText.setText("TO-DO");
+		playText.setText("No File selected!");
 		recordText.setText("No File selected!");
 		constraints.gridx = 0;
 		constraints.gridy = 1;
@@ -320,6 +314,34 @@ public class StartScreen extends JPanel {
 		add(buttonPanel, BorderLayout.NORTH);
 	}
 	
+	public JPanel getTitlePanel(final JTabbedPane tabbedPane, final JPanel panel, String title)
+	 {
+	  JPanel titlePanel = new JPanel(new GridBagLayout());
+	  GridBagConstraints constraints = new GridBagConstraints();
+	  titlePanel.setOpaque(false);
+	  JLabel titleLabel = new JLabel(title);
+	  constraints.anchor = GridBagConstraints.CENTER;
+	  constraints.gridx = 0;
+	  constraints.gridy = 0;
+	  
+	  titlePanel.add(titleLabel, constraints);
+	  JButton closeButton = new JButton(closeIcon);
+	  closeButton.setOpaque(false);
+	  closeButton.setContentAreaFilled(false);
+	  closeButton.setBorderPainted(false);
+	  closeButton.addActionListener((e) ->  {
+		  if (numTabs == 1) return; 
+		  else  {
+			  tabbedPane.remove(panel);
+			  numTabs--;
+		  }
+	  });
+	  constraints.anchor = GridBagConstraints.NORTHEAST;
+	  constraints.gridx = 1;
+	  constraints.gridy = 0;
+	  titlePanel.add(closeButton, constraints);
+	  return titlePanel;
+	 }
 	
 	/**
 	 * Takes in the name of a jar file and runs it while 
@@ -357,79 +379,57 @@ public class StartScreen extends JPanel {
 	}
 	
 	private void beginSession() {
+		SequenceController controller;
 		if (isRecording) {
-			if (!isFirstRun) {
-				createErrorDisplay();
-			}
-			isFirstRun = false;
-			SessionController sessionController = new SessionController(new Recorder());
-			Process proc = startProgram(selectedFile);
-			try {
-				Thread.sleep(600);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				throw new IllegalStateException("Program cannot wait for gui elements to load!");
-			}
-			sessionController.start();
-			startFrame.setState(Frame.ICONIFIED);
-			executorService.submit(new Runnable() {
-				
-				@Override
-				public void run() {
-					while (proc.isAlive()) {
-						
-					}
-					System.out.println("end");
-					sessionController.end();
-					startFrame.setState(Frame.NORMAL);
-					isRecording = false;
-					System.out.println("ended");
-				}
-			});
+			controller = new Recorder();
 		}
+		else {
+			controller = new Player(recorded);
+		}
+		if (!isFirstRun) {
+			createErrorDisplay();
+		}
+		isFirstRun = false;
+		SessionController sessionController = new SessionController(controller);
+		Process proc = startProgram(selectedJARFile);
+		try {
+			Thread.sleep(600);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("Program cannot wait for gui elements to load!");
+		}
+		sessionController.start();
+		startFrame.setState(Frame.ICONIFIED);
+		executorService.submit(new Runnable() {
+			
+			@Override
+			public void run() {
+				while (proc.isAlive()) {
+					
+				}
+				System.out.println("end");
+				sessionController.end();
+				startFrame.setState(Frame.NORMAL);
+				isRecording = false;
+				System.out.println("ended");
+			}
+		});
 	}
 	
-	public JPanel getTitlePanel(final JTabbedPane tabbedPane, final JPanel panel, String title)
-	 {
-	  JPanel titlePanel = new JPanel(new GridBagLayout());
-	  GridBagConstraints constraints = new GridBagConstraints();
-	  titlePanel.setOpaque(false);
-	  JLabel titleLabel = new JLabel(title);
-	  constraints.anchor = GridBagConstraints.CENTER;
-	  constraints.gridx = 0;
-	  constraints.gridy = 0;
-	  
-	  titlePanel.add(titleLabel, constraints);
-	  JButton closeButton = new JButton(closeIcon);
-	  closeButton.setOpaque(false);
-	  closeButton.setContentAreaFilled(false);
-	  closeButton.setBorderPainted(false);
-	  closeButton.addActionListener((e) ->  {
-		  if (numTabs == 1) return; 
-		  else  {
-			  tabbedPane.remove(panel);
-			  numTabs--;
-		  }
-	  });
-	  constraints.anchor = GridBagConstraints.NORTHEAST;
-	  constraints.gridx = 1;
-	  constraints.gridy = 0;
-	  titlePanel.add(closeButton, constraints);
-	  return titlePanel;
-	 }
 		
 	/** 
 	 Handles file choosing and parsing
 	 */	
-	class FileSelect {
+	class JARFileSelect {
 		Component parent;
 		
-		public FileSelect(Component parent) {
+		public JARFileSelect(Component parent) {
 			this.parent = parent;
 		}
 		public void listen(ActionEvent e) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setFileFilter(new FileFilter() {
 				final String JAR_EXT="jar";
 				/**
@@ -454,24 +454,167 @@ public class StartScreen extends JPanel {
 				
 				@Override
 				public String getDescription() {
-					return "Please select a JAR file.";
+					return ".jar";
 				}
 				
 				@Override
 				public boolean accept(File file) {
-					return isJAR(file.getName());
+					return isJAR(file.getName()) || file.isDirectory();
 				}
 			});
 		    int returnVal = fileChooser.showOpenDialog(parent);
 		    if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            File file = fileChooser.getSelectedFile();
-		           recentLog.addToLog(file.getAbsolutePath());
-		           selectedFile = file.getAbsolutePath();
-		           recordText.setText(selectedFile);
-		           isSelected = true;
+		           recentJARLog.addToLog(file.getAbsolutePath());
+		           selectedJARFile = file.getAbsolutePath();
+		           recordText.setText(selectedJARFile);
+		           isSelectedJARFile = true;
 		    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 		    	JOptionPane.showMessageDialog(startFrame, "Please select JAR file.");
 		   }
 		}
 	}
+	
+	class RecentJARMenuListener implements MenuListener {
+		JMenu menu;
+		
+		public RecentJARMenuListener(JMenu menu) {
+			this.menu = menu;
+		}
+		/*
+		 * Handles starting previously opened applications 
+		 */
+		@Override
+		public void menuSelected(MenuEvent e) {
+			List <String> recentPaths = recentJARLog.readFromLog();
+			for (String path : recentPaths) {
+				final JMenuItem recent = new JMenuItem(path);
+				recent.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						selectedJARFile=recent.getText();
+						recentJARLog.addToLog(recent.getText());
+						isSelectedJARFile = true;
+						recordText.setText(selectedJARFile);
+					}
+				});
+				menu.add(recent);
+			}
+			
+		}
+		
+		@Override
+		public void menuDeselected(MenuEvent e) {
+			menu.removeAll();
+			
+		}
+		
+		@Override
+		public void menuCanceled(MenuEvent e) {
+			// do nothing
+			
+		}
+	}
+	
+	/** 
+	 Handles file choosing and parsing
+	 */	
+	class RCDRFileSelect {
+		Component parent;
+		
+		public RCDRFileSelect(Component parent) {
+			this.parent = parent;
+		}
+		public void listen(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setFileFilter(new FileFilter() {
+				final String RCDR_EXT="rcdr";
+				/**
+				 * 
+				 * @param fileName name of file to be filtered
+				 * @return string representing extension
+				 */
+			    private String getExtension(String fileName) {
+			        String ext = null;
+			        int i = fileName.lastIndexOf('.');
+	
+			        if (i > 0 &&  i < fileName.length() - 1) {
+			            ext = fileName.substring(i+1).toLowerCase();
+			        }
+			        return ext;
+			    }
+			    
+				private boolean isJAR(String fileName) {
+					String ext = getExtension(fileName);
+					return (ext==null) ? false : ext.equals(RCDR_EXT);
+				}
+				
+				@Override
+				public String getDescription() {
+					return ".rcdr";
+				}
+				
+				@Override
+				public boolean accept(File file) {
+					return isJAR(file.getName()) || file.isDirectory();
+				}
+			});
+		    int returnVal = fileChooser.showOpenDialog(parent);
+		    if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File file = fileChooser.getSelectedFile();
+		           recentRCDRLog.addToLog(file.getAbsolutePath());
+		           selectedRCDRFile = file.getAbsolutePath();
+		           recordText.setText(selectedRCDRFile);
+		           isSelectedJARFile = true;
+		    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
+		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
+		   }
+		}
+	}
+	
+	class RecentRCDRMenuListener implements MenuListener {
+		JMenu menu;
+		
+		public RecentRCDRMenuListener(JMenu menu) {
+			this.menu = menu;
+		}
+		/*
+		 * Handles starting previously opened applications 
+		 */
+		@Override
+		public void menuSelected(MenuEvent e) {
+			List <String> recentPaths = recentRCDRLog.readFromLog();
+			for (String path : recentPaths) {
+				final JMenuItem recent = new JMenuItem(path);
+				recent.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						selectedRCDRFile=recent.getText();
+						recentRCDRLog.addToLog(recent.getText());
+						isSelectedRCDRFile = true;
+						playText.setText(selectedRCDRFile);
+					}
+				});
+				menu.add(recent);
+			}
+			
+		}
+		
+		@Override
+		public void menuDeselected(MenuEvent e) {
+			menu.removeAll();
+			
+		}
+		
+		@Override
+		public void menuCanceled(MenuEvent e) {
+			// do nothing
+			
+		}
+	}
 }
+

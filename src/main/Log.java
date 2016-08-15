@@ -23,19 +23,15 @@ import javax.swing.event.ListSelectionEvent;
  * 
  */
 public enum Log {
-	RECENT;
-	private final String FILE_NAME = "recentLog.txt" ;
-	//private final String FILE_PATH = "resources/config/";
+	JAR("recentJARLog.txt"), RCDR("recentRCDRLog.txt");
 	private File rLog;
 	private final int LIMIT = 10;
-	/* private InputStream rLog_jar = null;
-	private Boolean read_jar = false ; */
 	
 	/**
 	 * Singleton constructor that makes a recentLog file if one doesn't exist 
 	 */
-	Log() {
-		this.rLog = new File(FILE_NAME);
+	Log(String fileName) {
+		this.rLog = new File(fileName);
 		// TODO: Refactor this code to remove check for file existence and actual path checks
 		if(!rLog.exists()) { 
 			try {
