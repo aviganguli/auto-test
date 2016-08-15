@@ -12,44 +12,58 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-
-import gui.Main;
+import javax.swing.event.ListSelectionEvent;
 
 
 /**
  * 
- * @author samuellee & StrawhatJedi
+ * @author samuellee & AvishekGanguli
  * Create a new file log that contains 10 most recently used
  * file paths.  - Singleton Class
  * 
  */
 public enum Log {
-	RECENT;
-	private final String FILE_NAME = "recentLog.txt" ;
-	private final String FILE_PATH = Main.PATH + "config/";
+	JAR("recentJARLog.txt"), RCDR("recentRCDRLog.txt");
 	private File rLog;
 	private final int LIMIT = 10;
 	
 	/**
-	 * Singleton constructor 
+	 * Singleton constructor that makes a recentLog file if one doesn't exist 
 	 */
-	Log() {
-		this.rLog = new File(FILE_PATH + FILE_NAME);
-		if(!rLog.exists() || rLog.isDirectory()) { 
-			throw new IllegalStateException("Log file should already exist.") ; 
+	Log(String fileName) {
+		this.rLog = new File(fileName);
+		// TODO: Refactor this code to remove check for file existence and actual path checks
+		if(!rLog.exists()) { 
+			try {
+				rLog.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new IllegalStateException("Shouldn't happen!");
+			}
+			
 		}
-	}
 	
-	public void addToLog(String path) {
-		try (Scanner scanner = new Scanner(rLog)) {
+		/* rLog_jar = getClass().getResourceAsStream( 
+				"/" + 
+				FILE_NAME); */
+	}
+
+	/**
+	 * Adds a file path to recentLog file
+	 */
+	public void addToLog(String path) { 
+		//reads from jar during first run else read from rLog
+		try (Scanner scanner = /*!(read_jar) ? new Scanner(rLog_jar) : */ new Scanner(rLog)) {
+			//if(!read_jar) read_jar = true ;
+			//sets to true after first read
 			List<String> paths = new ArrayList<String>();
 			while (scanner.hasNextLine()) {
 				paths.add(scanner.nextLine());
 			}
 			Set<String> uniquePaths = Collections.newSetFromMap(new LinkedHashMap<String, Boolean>(){
-				/**
-				 * boiler plate
-				 */
+			/**
+				 boiler plate
+			**/
 				private static final long serialVersionUID = 1L;
 
 				protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
@@ -64,7 +78,6 @@ public enum Log {
 			rLog.delete();
 			rLog.createNewFile();
 			PrintWriter fw = new PrintWriter(rLog);
-			System.out.println(uniquePaths);
 			for (String newPath : uniquePaths) {
 				fw.println(newPath);
 			}
@@ -77,6 +90,11 @@ public enum Log {
 			
 	}
 	
+	
+	/**
+	 * Returns a list to all file paths currently in the recentLog file
+	 * 
+	 */
 	public List<String> readFromLog() {
 		
 		List<String> result = new ArrayList<String>();
@@ -89,9 +107,46 @@ public enum Log {
 		} catch (FileNotFoundException e) {
 			throw new IllegalStateException("Log file should already exist.");
 		}
-	
+		Collections.reverse(result);
 		return result;
 	}
+	
+	/*  public void updateJar() {
+	try {
+		Process proc = Runtime.getRuntime().exec("jar uf " + 
+				System.getProperty("user.dir") 
+				+ File.separator + "exec.jar recentLog.txt" );
+		  StreamRedirector in = new StreamRedirector(proc.getInputStream(), System.out);
+	        StreamRedirector err = new StreamRedirector(proc.getErrorStream(), System.err);
+	        in.start();
+	        err.start();
+		proc.waitFor(1, TimeUnit.SECONDS);
+		rLog.delete();
+				
+	} catch (IOException e || InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
+	
+	public List<String> readFromLog() {
+		
+		List<String> result = new ArrayList<String>();
+		
+		try (Scanner scanner = (read_jar) ? new Scanner(rLog) : new Scanner(rLog_jar)) {
+			while (scanner.hasNextLine()) {
+				result.add(scanner.nextLine());
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		rLog_jar = getClass().getResourceAsStream(File.separator + 
+				FILE_NAME);
+		return result;
+	}*/
+	
 }
 	 
 

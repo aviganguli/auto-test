@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 /**
  * 
  * Redirects stream output to another output stream
- * @author StrawhatJedi
+ * @author AvishekGanguli
  */
 public class StreamRedirector extends Thread {
 	    private InputStream is;
@@ -22,6 +22,11 @@ public class StreamRedirector extends Thread {
 	        this.os=os;
 	    }
 
+	    /**
+	     *
+	     * Redirects stream from input to output. 
+	     * 
+	     */
 	    public void run() {
 	        try {
 	            InputStreamReader isr = new InputStreamReader(is);

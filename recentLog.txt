@@ -1,0 +1,15 @@
+<<<<<<< HEAD:resources/config/recentLog.txt
+d
+e
+f
+g
+h
+i
+j
+k
+/Users/samuellee/auto-test/resources/test.jar
+/Users/Ganguli/auto-test/resources/test.jar
+=======
+/Users/samuellee/auto-test/resources/test.jar
+/Users/Ganguli/auto-test/run/exec.jar
+>>>>>>> be89d0ac70322c91de75f41333be563783fafaab:recentLog.txt
