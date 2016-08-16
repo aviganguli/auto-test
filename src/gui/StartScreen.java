@@ -42,16 +42,24 @@ import javax.swing.text.StyledDocument;
 
 import com.apple.laf.AquaTabbedPaneUI;
 
+
 import main.BlockingArrayList;
 import main.JTextAreaOutputStream;
 import main.Log;
 import main.Player;
 import main.RCDRParser;
+
+import main.JTextAreaOutputStream;
+import main.Log;
+import main.Player;
+
 import main.Recorder;
 import main.SequenceController;
 import main.SessionController;
 import main.StreamRedirector;
+
 import main.Tuple;
+
 import main.WindowManager;
 
 /**
@@ -97,9 +105,12 @@ public class StartScreen extends JPanel {
 	 * @param appFrame frame app runs in
 	 */
 	StartScreen(JFrame appFrame) {
-		BlockingArrayList<Tuple<?, ?>> arr = RCDRParser.parseFromFile("trial.rcdr") ;
+
+		/*BlockingArrayList<Tuple<?, ?>> arr = RCDRParser.parseFromFile("trial.rcdr") ;
 		System.out.println(arr);
-		RCDRParser.parseToFile(arr, "/Users/samuellee/auto-test/run/trial2.rcdr") ;
+		RCDRParser.parseToFile(arr, "/Users/samuellee/auto-test/run/trial2.rcdr") ;*/
+
+
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		recentJARLog = Log.JAR;
 		recentRCDRLog = Log.RCDR;
