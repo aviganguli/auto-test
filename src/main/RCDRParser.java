@@ -11,6 +11,7 @@ import java.util.Scanner;
 public class RCDRParser {
 	
 	public static File parseToFile(List<Tuple<?, ?>> recorded, String filePath) {
+		
 		File result = new File(filePath);
 		if(result.exists()) { 
 			throw new IllegalArgumentException("Error: Overwriting existing files!");
@@ -55,9 +56,9 @@ public class RCDRParser {
 		}
 	}
 	
-	public static BlockingArrayList<Tuple<?,?>> parseFromFile(String filePath) {
+	public static List<Tuple<?, ?>> parseFromFile(String filePath) {
 		File file = new File(filePath) ;
-		BlockingArrayList<Tuple <?,?>> result = new BlockingArrayList<>() ;
+		List<Tuple <?,?>> result = new BlockingArrayList<>() ;
 		if(! file.exists()) {
 			throw new IllegalStateException("Error: Filepath not valid!") ;
 		}
