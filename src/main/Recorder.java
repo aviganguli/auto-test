@@ -5,6 +5,7 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -138,6 +139,11 @@ public class Recorder implements SequenceController {
 		
 	}
 
+
+	@Override
+	public List<Tuple<?, ?>> getRecorded() {
+		return listener.getRecorded();
+	}
 	
 	private void removeAll() {
 		GlobalScreen.removeNativeMouseListener(listener);

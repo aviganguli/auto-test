@@ -42,13 +42,16 @@ import javax.swing.text.StyledDocument;
 
 import com.apple.laf.AquaTabbedPaneUI;
 
+import main.BlockingArrayList;
 import main.JTextAreaOutputStream;
 import main.Log;
 import main.Player;
+import main.RCDRParser;
 import main.Recorder;
 import main.SequenceController;
 import main.SessionController;
 import main.StreamRedirector;
+import main.Tuple;
 import main.WindowManager;
 
 /**
@@ -180,7 +183,7 @@ public class StartScreen extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				RCDRFileSelect fileSelect = new RCDRFileSelect(addPlayItem);
-				fileSelect.listen(e);		
+				fileSelect.open(e);		
 			}
 		});
 		JMenu recentPlayItem = new JMenu(RECENT_APP_ITEM);
@@ -379,12 +382,9 @@ public class StartScreen extends JPanel {
 	}
 	
 	private void beginSession() {
-		SequenceController controller;
+		SequenceController controller = null;
 		if (isRecording) {
 			controller = new Recorder();
-		}
-		else {
-			controller = new Player(recorded);
 		}
 		if (!isFirstRun) {
 			createErrorDisplay();
@@ -408,9 +408,11 @@ public class StartScreen extends JPanel {
 					
 				}
 				System.out.println("end");
-				sessionController.end();
+				List<Tuple<?, ?>> recorded = sessionController.end();
 				startFrame.setState(Frame.NORMAL);
 				isRecording = false;
+				RCDRFileSelect fileSelect = new RCDRFileSelect(StartScreen.this);
+				fileSelect.save(recorded);
 				System.out.println("ended");
 			}
 		});
@@ -420,7 +422,7 @@ public class StartScreen extends JPanel {
 	/** 
 	 Handles file choosing and parsing
 	 */	
-	class JARFileSelect {
+	class JARFileSelect extends JFileChooser {
 		Component parent;
 		
 		public JARFileSelect(Component parent) {
@@ -520,13 +522,14 @@ public class StartScreen extends JPanel {
 	/** 
 	 Handles file choosing and parsing
 	 */	
-	class RCDRFileSelect {
+	class RCDRFileSelect extends JFileChooser{
 		Component parent;
 		
 		public RCDRFileSelect(Component parent) {
 			this.parent = parent;
 		}
-		public void listen(ActionEvent e) {
+		
+		public void open(ActionEvent e) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -547,7 +550,7 @@ public class StartScreen extends JPanel {
 			        return ext;
 			    }
 			    
-				private boolean isJAR(String fileName) {
+				private boolean isRCDR(String fileName) {
 					String ext = getExtension(fileName);
 					return (ext==null) ? false : ext.equals(RCDR_EXT);
 				}
@@ -559,7 +562,7 @@ public class StartScreen extends JPanel {
 				
 				@Override
 				public boolean accept(File file) {
-					return isJAR(file.getName()) || file.isDirectory();
+					return isRCDR(file.getName()) || file.isDirectory();
 				}
 			});
 		    int returnVal = fileChooser.showOpenDialog(parent);
@@ -572,6 +575,51 @@ public class StartScreen extends JPanel {
 		    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
 		   }
+		}
+		
+		public void save(List<Tuple<?, ?>> recorded) {
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setFileFilter(new FileFilter() {
+				final String RCDR_EXT="rcdr";
+				/**
+				 * 
+				 * @param fileName name of file to be filtered
+				 * @return string representing extension
+				 */
+			    private String getExtension(String fileName) {
+			        String ext = null;
+			        int i = fileName.lastIndexOf('.');
+	
+			        if (i > 0 &&  i < fileName.length() - 1) {
+			            ext = fileName.substring(i+1).toLowerCase();
+			        }
+			        return ext;
+			    }
+			    
+				private boolean isRCDR(String fileName) {
+					String ext = getExtension(fileName);
+					return (ext==null) ? false : ext.equals(RCDR_EXT);
+				}
+				
+				@Override
+				public String getDescription() {
+					return ".rcdr";
+				}
+				
+				@Override
+				public boolean accept(File file) {
+					return (isRCDR(file.getName()) || file.isDirectory()) && !file.exists();
+				}
+			});
+			int returnVal = fileChooser.showSaveDialog(StartScreen.this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				selectedRCDRFile = fileChooser.getSelectedFile().getAbsolutePath();
+				playText.setText(selectedRCDRFile);
+				isSelectedRCDRFile = true;
+				RCDRParser.parseToFile(recorded, selectedRCDRFile);
+			}
 		}
 	}
 	

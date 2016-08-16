@@ -8,11 +8,11 @@ import java.util.List;
 
 public class Player implements SequenceController {
 	private Robot robot;
-	private List<Tuple<?,?>> recorded;
+	private List<Tuple<?, ?>> recorded;
 	private boolean paused;
 	private Tuple<?,?> currentElem;
 	
-	public Player(List<Tuple<?,?>> recorded) {
+	public Player(List<Tuple<?, ?>> recorded) {
 		this.recorded = recorded;
 		this.paused = false;
 		try {
@@ -109,6 +109,11 @@ public class Player implements SequenceController {
 	public void fastForward() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<Tuple<?, ?>> getRecorded() {
+		return recorded;
 	}
 
 }

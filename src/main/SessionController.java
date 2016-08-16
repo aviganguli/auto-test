@@ -1,5 +1,7 @@
 package main;
 
+import java.util.List;
+
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.SwingDispatchService;
@@ -33,11 +35,12 @@ public class SessionController implements NativeMouseInputListener {
 		bar = new ControlBar(controller, this);	
 	}
 	
-	public void end() {
+	public List<Tuple<?, ?>> end() {
 		if (isFirstRun) {
 			bar.dispose();
 		}
 		removeAll();
+		return controller.getRecorded();
 	}
 	
 	private void removeAll() {
