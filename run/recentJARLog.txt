@@ -1,1 +1,2 @@
 /Users/Ganguli/auto-test/resources/test.jar
+/Users/samuellee/auto-test/resources/test.jar
