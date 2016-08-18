@@ -276,6 +276,8 @@ public class StartScreen extends JPanel {
 						    "Please select a recording.",
 						    "Auto-Test: Warning",
 						    JOptionPane.WARNING_MESSAGE);
+					RCDRFileSelect fileSelect = new RCDRFileSelect(recordButton);
+					fileSelect.open(e);
 					return;
 				}
 				isRecording = false;
@@ -540,7 +542,7 @@ public class StartScreen extends JPanel {
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setFileFilter(new FileFilter() {
-				
+		
 				@Override
 				public String getDescription() {
 					return "." + RCDR_EXT;
@@ -548,9 +550,9 @@ public class StartScreen extends JPanel {
 				
 				@Override
 				public boolean accept(File file) {
-					return isRCDR(file.getName()) || file.isDirectory();
+					return ((isRCDR(file.getName()) == null) || (isRCDR(file.getName()).booleanValue()) ||   
+							file.isDirectory());
 				}
-				
 			});
 		    int returnVal = fileChooser.showOpenDialog(parent);
 		    if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -568,20 +570,6 @@ public class StartScreen extends JPanel {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			fileChooser.setFileFilter(new FileFilter() {
-		
-				@Override
-				public String getDescription() {
-					return "." + RCDR_EXT;
-				}
-				
-				@Override
-				public boolean accept(File file) {
-					if(isRCDR(file.getName()) == null) return true ;
-					return ((isRCDR(file.getName()).booleanValue()) ||   
-							file.isDirectory());
-				}
-			});
 			int returnVal = fileChooser.showSaveDialog(StartScreen.this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				
@@ -601,6 +589,9 @@ public class StartScreen extends JPanel {
 				isSelectedRCDRFile = true;
 				RCDRParser.parseToFile(recorded, selectedRCDRFile);
 			}
+			else if (returnVal == JFileChooser.CANCEL_OPTION) {
+		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
+		   }
 		}
 		
 		final String RCDR_EXT="rcdr";
