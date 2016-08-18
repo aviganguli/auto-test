@@ -102,7 +102,7 @@ public class StartScreen extends JPanel {
 		RCDRParser.parseToFile(arr, "/Users/samuellee/auto-test/run/trial2.rcdr") ;*/
 
 
-		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 		recentJARLog = Log.JAR;
 		recentRCDRLog = Log.RCDR;
 		this.OS_TYPE = System.getProperty("os.name").toLowerCase() ;
@@ -421,6 +421,7 @@ public class StartScreen extends JPanel {
 				RCDRFileSelect fileSelect = new RCDRFileSelect(StartScreen.this);
 				fileSelect.save(recorded);
 				System.out.println("ended");
+				return;
 			}
 		});
 	}
@@ -436,7 +437,7 @@ public class StartScreen extends JPanel {
 			this.parent = parent;
 		}
 		public void listen(ActionEvent e) {
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = this;
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setFileFilter(new FileFilter() {
@@ -538,7 +539,7 @@ public class StartScreen extends JPanel {
 		}
 		
 		public void open(ActionEvent e) {
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = this;
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setFileFilter(new FileFilter() {
@@ -567,10 +568,10 @@ public class StartScreen extends JPanel {
 		}
 		
 		public void save(List<Tuple<?, ?>> recorded) {
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = this;
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int returnVal = fileChooser.showSaveDialog(StartScreen.this);
+			int returnVal = fileChooser.showSaveDialog(fileChooser.getParent());
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				
 				selectedRCDRFile = fileChooser.getSelectedFile().getAbsolutePath();
@@ -592,6 +593,7 @@ public class StartScreen extends JPanel {
 			else if (returnVal == JFileChooser.CANCEL_OPTION) {
 		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
 		   }
+			removeAll();
 		}
 		
 		final String RCDR_EXT="rcdr";
