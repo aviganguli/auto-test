@@ -388,16 +388,9 @@ public class StartScreen extends JPanel {
         return proc;
 	}
 	
-	private void beginSession() {
-		SequenceController controller = null;
-		if (isRecording) {
-			controller = new Recorder();
-		}
-		if (!isFirstRun) {
-			createErrorDisplay();
-		}
-		isFirstRun = false;
-		SessionController sessionController = new SessionController(controller);
+	private void beginRecording() {
+		Recorder recorder = new Recorder();
+		SessionController sessionController = new SessionController(recorder);
 		Process proc = startProgram(selectedJARFile);
 		try {
 			Thread.sleep(600);
@@ -424,6 +417,26 @@ public class StartScreen extends JPanel {
 				return;
 			}
 		});
+	}
+	
+	private void beginPlaying() {
+		Tuple<String, List<Tuple<?, ?>>> tuple = RCDRParser.parseFromFile(selectedRCDRFile);
+		Player player = new Player(tuple.getSecond());
+		startProgram(tuple.getFirst());
+		player.play();
+	}
+	
+	private void beginSession() {
+		if (!isFirstRun) {
+			createErrorDisplay();
+		}
+		isFirstRun = false;
+		if (isRecording) {
+			beginRecording();
+		}
+		else {
+			beginPlaying();
+		}
 	}
 	
 		
@@ -560,8 +573,8 @@ public class StartScreen extends JPanel {
 		            File file = fileChooser.getSelectedFile();
 		           recentRCDRLog.addToLog(file.getAbsolutePath());
 		           selectedRCDRFile = file.getAbsolutePath();
-		           recordText.setText(selectedRCDRFile);
-		           isSelectedJARFile = true;
+		           playText.setText(selectedRCDRFile);
+		           isSelectedRCDRFile = true;
 		    } else if (returnVal==JFileChooser.CANCEL_OPTION) {
 		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
 		   }
@@ -588,7 +601,7 @@ public class StartScreen extends JPanel {
 				
 				playText.setText(selectedRCDRFile);
 				isSelectedRCDRFile = true;
-				RCDRParser.parseToFile(recorded, selectedRCDRFile);
+				RCDRParser.parseToFile(recorded, selectedRCDRFile, selectedJARFile);
 			}
 			else if (returnVal == JFileChooser.CANCEL_OPTION) {
 		    	JOptionPane.showMessageDialog(startFrame, "Please select RCDR file.");
