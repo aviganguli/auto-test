@@ -6,6 +6,7 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -70,6 +71,7 @@ public class StartScreen extends JPanel {
 	private final String RECORD_TOOLTIP = "Begin recording the selected file";
 	private final String PLAY_TOOLTIP = "Begin playing the selected recording";
 	private final String CLEAR_TOOLTIP = "Clear the console";
+	private final String NEWTAB_TOOLTIP = "Create new tab" ;
 	private final String RECORD_MENU_ITEM = "Recording";
 	private final String PLAY_MENU_ITEM = "Playback";
 	private static Log recentJARLog;
@@ -218,18 +220,42 @@ public class StartScreen extends JPanel {
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find icons to display on buttons!") ;
 		}
+		JPanel tabPanel = new JPanel(new GridLayout(2, 1)) ;
 		JButton clearButton = new JButton(clearIcon);
 		clearButton.addActionListener((e) -> errorBox.setText(""));
 		clearButton.setOpaque(false);
 		clearButton.setContentAreaFilled(false);
 		clearButton.setBorderPainted(false);
 		clearButton.setToolTipText(CLEAR_TOOLTIP);
+		tabPanel.add(clearButton);
+		
+		ImageIcon newTabIcon ;
+		try {
+			newTabIcon = new ImageIcon(ImageIO.read(getClass().getResource("/Icons/newTab.png")));
+		} catch (IOException e) {
+			throw new IllegalStateException("Cannot find icons to display on buttons!") ;
+		}
+		JButton newTabButton = new JButton(newTabIcon) ;
+		newTabButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				createErrorDisplay();
+			}
+		});
+		newTabButton.setOpaque(false);
+		newTabButton.setContentAreaFilled(false);
+		newTabButton.setBorderPainted(false);
+		newTabButton.setToolTipText(NEWTAB_TOOLTIP);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.weightx = 0;
 		constraints.weighty = 0;
 		constraints.anchor = GridBagConstraints.NORTH;
-		errorPanel.add(clearButton, constraints);
+		tabPanel.add(newTabButton) ;
+		errorPanel.add(tabPanel, constraints);
+		
+		
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.weightx = 1;
@@ -238,6 +264,7 @@ public class StartScreen extends JPanel {
 		errorPanel.add(scrollBox, constraints);
 		tabbedPane.addTab("Tab " + totalNumTabs, errorPanel);
 		tabbedPane.setTabComponentAt(numTabs-1, getTitlePanel(tabbedPane, errorPanel, "Tab " + totalNumTabs));
+		tabbedPane.setSelectedIndex(tabbedPane.indexOfTab("Tab " + totalNumTabs) ) ;
 	}
 	
 	private void createModeButtons() {
