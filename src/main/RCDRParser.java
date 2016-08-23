@@ -10,13 +10,14 @@ import java.util.Scanner;
 
 public class RCDRParser {
 	
-	public static File parseToFile(List<Tuple<?, ?>> recorded, String filePath) {
+	public static File parseToFile(List<Tuple<?, ?>> recorded, String filePath, String jarPath) {
 		
 		File result = new File(filePath);
 		if(result.exists()) { 
 			throw new IllegalArgumentException("Error: Overwriting existing files!");
 		}
 		try (PrintWriter pw = new PrintWriter(result)) {
+			pw.println(jarPath);
 			for (Tuple<?, ?> tuple : recorded) {
 				Integer event = (Integer) tuple.getFirst();
 				if (event == MouseEvent.MOUSE_MOVED) {
@@ -56,13 +57,14 @@ public class RCDRParser {
 		}
 	}
 	
-	public static List<Tuple<?, ?>> parseFromFile(String filePath) {
+	public static Tuple<String,List<Tuple<?, ?>>> parseFromFile(String filePath) {
 		File file = new File(filePath) ;
-		List<Tuple <?,?>> result = new BlockingArrayList<>() ;
+		List<Tuple <?,?>> resultList = new BlockingArrayList<>() ;
 		if(! file.exists()) {
 			throw new IllegalStateException("Error: Filepath not valid!") ;
 		}
 		try (Scanner scanner = new Scanner(file)) {
+			String resultFile = scanner.nextLine();
 			while(scanner.hasNextLine()) {
 				String[] lineArr = scanner.nextLine().split("\\s+") ;
 				int event = Integer.parseInt(lineArr[0]) ;
@@ -91,9 +93,9 @@ public class RCDRParser {
 				default:
 					throw new IllegalStateException("Invalid Event code : " + event);
 				}			
-				result.add(tuple) ;
+				resultList.add(tuple) ;
 			}
-			return result ;
+			return new Tuple<String, List<Tuple<?,?>>>(resultFile, resultList) ;
 		} catch (FileNotFoundException e) {
 			throw new IllegalStateException("Scanner Initialization Failed!") ;
 		}		
