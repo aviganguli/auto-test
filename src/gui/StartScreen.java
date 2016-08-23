@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -33,6 +34,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -115,6 +118,17 @@ public class StartScreen extends JPanel {
 		this.numTabs = 0;
 		this.totalNumTabs = 0;
 		this.tabbedPane = new JTabbedPane();
+		this.tabbedPane.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				JTabbedPane tab = (JTabbedPane) e.getSource() ;
+				ErrorPanel errPanel = (ErrorPanel) tab.getSelectedComponent() ;
+				StartScreen.this.errorBox = errPanel.getTextArea() ;
+				System.out.println("State Changed " + tab.getSelectedIndex());
+			}
+		});
+		
 		if(OS_TYPE.contains("mac")){ 
 			// for Mac
 			tabbedPane.setUI(new AquaTabbedPaneUI()  {
@@ -205,14 +219,35 @@ public class StartScreen extends JPanel {
 	}
 	
 	
+	class ErrorPanel extends JPanel{
+		private JTextArea textBox ;
+		
+		public ErrorPanel(LayoutManager layout) {
+			this.setLayout(layout);
+		}
+		
+		public void setTextArea(JTextArea textArea) {
+			
+			this.textBox = textArea ;
+		}
+		
+		public JTextArea getTextArea() {
+			
+			return this.textBox ;
+		}
+	}
+	
 	private void createErrorDisplay() {
 		numTabs++;
 		totalNumTabs++;
+		System.out.println(totalNumTabs); //DEBUG
 		errorBox = new JTextArea();
 		errorBox.setEditable(false);
 		errorBox.setLineWrap (false);
 		JScrollPane scrollBox = new JScrollPane(errorBox);
-		JPanel errorPanel = new JPanel(new GridBagLayout());
+		ErrorPanel errorPanel = new ErrorPanel(new GridBagLayout());
+		errorPanel.setTextArea(errorBox);
+		
 		GridBagConstraints constraints = new GridBagConstraints();
 		ImageIcon clearIcon;
 		try {
@@ -449,7 +484,7 @@ public class StartScreen extends JPanel {
 	
 	private void beginSession() {
 		if (!isFirstRun) {
-			createErrorDisplay();
+			//createErrorDisplay();
 		}
 		isFirstRun = false;
 		if (isRecording) {
